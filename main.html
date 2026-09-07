@@ -32,11 +32,11 @@
               class="flex items-center gap-2.5 cursor-pointer"
               onclick="showScreen('dashboard')"
             >
-              <img 
+              <img
                 src="imgs/logo.png"
                 class="w-9 h-9 rounded bg-[var(--brand)] flex items-center justify-center font-black text-black"
-              >
-              
+              />
+
               <span class="font-display font-extrabold text-lg">TeamForge</span>
             </div>
             <button
@@ -98,6 +98,28 @@
               </svg>
               My Teams
             </div>
+
+            <!-- ===================== MESSAGES ===================== -->
+
+            <a href="msg.html" class="nav-item" data-nav="messages">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path
+                  d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8A2.5 2.5 0 0 1 17.5 16H10l-5 4v-4.5A2.5 2.5 0 0 1 4 13Z"
+                />
+
+                <path d="M8 8h8M8 11h5" />
+              </svg>
+
+              Messages
+
+              <span
+                id="message-badge"
+                class="ml-auto text-[10px] font-bold bg-[var(--brand)] text-black rounded-full min-w-5 h-5 px-1 flex items-center justify-center"
+              >
+                3
+              </span>
+            </a>
+
             <div
               class="nav-item"
               data-nav="invitations"
@@ -210,7 +232,7 @@
             <section id="screen-dashboard" class="app-screen">
               <div class="mb-8">
                 <h1 class="font-display font-bold text-3xl mb-1">
-                  Good afternoon,  👋
+                  Good afternoon, 👋
                 </h1>
                 <p class="text-[var(--muted)]">
                   Ready to forge your next great team?

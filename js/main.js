@@ -884,7 +884,7 @@ async function addRecommendedTeammate(candidateId, button) {
 
     const {
       data: { user },
-      error: authError
+      error: authError,
     } = await supabaseClient.auth.getUser();
 
     if (authError || !user) throw authError;
@@ -893,7 +893,7 @@ async function addRecommendedTeammate(candidateId, button) {
       project_id: project.id,
       sender_id: user.id,
       receiver_id: candidateId,
-      status: "pending"
+      status: "pending",
     });
 
     if (error) {
@@ -918,7 +918,7 @@ async function loadAvailableTeams() {
   try {
     const {
       data: { user },
-      error: authError
+      error: authError,
     } = await supabaseClient.auth.getUser();
 
     if (authError || !user) {
@@ -928,7 +928,8 @@ async function loadAvailableTeams() {
 
     const { data: projects, error } = await supabaseClient
       .from("projects")
-      .select(`
+      .select(
+        `
         id,
         name,
         description,
@@ -941,7 +942,8 @@ async function loadAvailableTeams() {
         team_members (
           user_id
         )
-      `)
+      `,
+      )
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -951,14 +953,14 @@ async function loadAvailableTeams() {
     }
 
     const availableTeams = (projects || []).filter((project) => {
-      const alreadyMember = (project.team_members || [])
-        .some((member) => member.user_id === user.id);
+      const alreadyMember = (project.team_members || []).some(
+        (member) => member.user_id === user.id,
+      );
 
       return !alreadyMember;
     });
 
     renderAvailableTeams(availableTeams);
-
   } catch (error) {
     console.error("Load teams error:", error);
   }
@@ -982,12 +984,12 @@ function renderAvailableTeams(teams) {
     return;
   }
 
-  container.innerHTML = teams.map((team) => {
-    const members = team.team_members || [];
-    const leaderName =
-      team.profiles?.name || "Team Leader";
+  container.innerHTML = teams
+    .map((team) => {
+      const members = team.team_members || [];
+      const leaderName = team.profiles?.name || "Team Leader";
 
-    return `
+      return `
       <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
         
         <div class="flex items-start justify-between gap-4">
@@ -1021,37 +1023,39 @@ function renderAvailableTeams(teams) {
           </span>
 
           <button
-            type="button"
-            onclick="joinTeam('${team.id}', this)"
-            class="px-4 py-2 rounded-xl text-xs font-bold
-                   bg-[var(--brand)] text-black
-                   hover:opacity-90 transition"
-          >
-            Join Team
+          onclick="viewTeam('${project.id}')"
+          class="btn-secondary w-full py-2.5 rounded-xl text-sm"
+          >     
+            View Team
           </button>
 
         </div>
       </div>
     `;
-  }).join("");
+    })
+    .join("");
 }
-
 
 // Helper to fetch the logged-in user's active/latest project
 async function getCurrentProject() {
-  const { data: { user }, error: authErr } = await supabaseClient.auth.getUser();
+  const {
+    data: { user },
+    error: authErr,
+  } = await supabaseClient.auth.getUser();
   if (authErr || !user) return null;
 
   const { data: projects, error } = await supabaseClient
     .from("projects")
-    .select(`
+    .select(
+      `
       id,
       name,
       description,
       category,
       project_skills ( skill ),
       project_roles ( role )
-    `)
+    `,
+    )
     .eq("leader_id", user.id)
     .order("created_at", { ascending: false })
     .limit(1);
@@ -1065,11 +1069,17 @@ async function getRecommendedTeammates(limit = 6) {
   const project = await getCurrentProject();
   if (!project) return [];
 
-  const requiredSkills = (project.project_skills || []).map((s) => s.skill.toLowerCase());
-  const requiredRoles = (project.project_roles || []).map((r) => r.role.toLowerCase());
+  const requiredSkills = (project.project_skills || []).map((s) =>
+    s.skill.toLowerCase(),
+  );
+  const requiredRoles = (project.project_roles || []).map((r) =>
+    r.role.toLowerCase(),
+  );
 
   // Fetch candidate profiles (excluding current user)
-  const { data: { user } } = await supabaseClient.auth.getUser();
+  const {
+    data: { user },
+  } = await supabaseClient.auth.getUser();
   const { data: profiles, error } = await supabaseClient
     .from("profiles")
     .select("*")
@@ -1079,12 +1089,14 @@ async function getRecommendedTeammates(limit = 6) {
 
   // Calculate match scores for each candidate
   const scoredCandidates = profiles.map((candidate) => {
-    const candidateSkills = (candidate.skills || []).map((s) => s.toLowerCase());
+    const candidateSkills = (candidate.skills || []).map((s) =>
+      s.toLowerCase(),
+    );
     const candidateRole = (candidate.role || "").toLowerCase();
 
     // 1. Skill match calculation
     const matchedSkills = candidateSkills.filter((skill) =>
-      requiredSkills.some((req) => req.includes(skill) || skill.includes(req))
+      requiredSkills.some((req) => req.includes(skill) || skill.includes(req)),
     );
 
     let score = 0;
@@ -1095,7 +1107,11 @@ async function getRecommendedTeammates(limit = 6) {
     }
 
     // 2. Role compatibility calculation
-    if (requiredRoles.some((role) => candidateRole.includes(role) || role.includes(candidateRole))) {
+    if (
+      requiredRoles.some(
+        (role) => candidateRole.includes(role) || role.includes(candidateRole),
+      )
+    ) {
       score += 30;
     } else {
       score += 10;
@@ -1114,12 +1130,16 @@ async function getRecommendedTeammates(limit = 6) {
       year: candidate.year || "3rd Year",
       matchScore: matchScore,
       skills: candidate.skills || [],
-      matchedSkills: candidate.skills?.filter((s) =>
-        requiredSkills.some((req) => req.includes(s.toLowerCase()) || s.toLowerCase().includes(req))
-      ) || [],
+      matchedSkills:
+        candidate.skills?.filter((s) =>
+          requiredSkills.some(
+            (req) =>
+              req.includes(s.toLowerCase()) || s.toLowerCase().includes(req),
+          ),
+        ) || [],
       filledGaps: matchedSkills,
       availability: candidate.availability || "10–15 hrs/week",
-      skill_level: candidate.skill_level || "Intermediate"
+      skill_level: candidate.skill_level || "Intermediate",
     };
   });
 
@@ -1260,17 +1280,14 @@ async function openWhyModal(id) {
     // Get the same recommendations shown on screen
     const recommendations = await getRecommendedTeammates(6);
 
-    const candidate = recommendations.find(
-      (person) => person.id === id
-    );
+    const candidate = recommendations.find((person) => person.id === id);
 
     if (!candidate) {
       console.error("Candidate not found:", id);
       return;
     }
 
-    const firstName =
-      (candidate.name || "Student").split(" ")[0];
+    const firstName = (candidate.name || "Student").split(" ")[0];
 
     title.textContent = `🤖 Why ${firstName}?`;
 
@@ -1341,15 +1358,14 @@ Explain:
 `;
 
     // Call Supabase Edge Function → Gemini
-    const { data, error } =
-      await supabaseClient.functions.invoke(
-        "ai-recommend",
-        {
-          body: {
-            prompt
-          }
-        }
-      );
+    const { data, error } = await supabaseClient.functions.invoke(
+      "ai-recommend",
+      {
+        body: {
+          prompt,
+        },
+      },
+    );
 
     if (error) {
       console.error("Gemini error:", error);
@@ -1366,17 +1382,12 @@ Explain:
       return;
     }
 
-    const explanation =
-      data?.response || "No explanation generated.";
+    const explanation = data?.response || "No explanation generated.";
 
     // Convert Gemini bullets into clean HTML
     const points = explanation
       .split("\n")
-      .map((line) =>
-        line
-          .replace(/^[\s*-•]+/, "")
-          .trim()
-      )
+      .map((line) => line.replace(/^[\s*-•]+/, "").trim())
       .filter(Boolean);
 
     text.innerHTML = points
@@ -1386,10 +1397,9 @@ Explain:
             <span class="why-check">✓</span>
             <span>${point}</span>
           </div>
-        `
+        `,
       )
       .join("");
-
   } catch (error) {
     console.error("Why recommendation error:", error);
 
@@ -1518,9 +1528,9 @@ function toggleFilter(tag) {
   renderTeams();
 }
 async function renderTeams() {
-  const q = (
-    document.getElementById("team-search")?.value || ""
-  ).toLowerCase().trim();
+  const q = (document.getElementById("team-search")?.value || "")
+    .toLowerCase()
+    .trim();
 
   const grid = document.getElementById("teams-grid");
 
@@ -1535,7 +1545,7 @@ async function renderTeams() {
   try {
     const {
       data: { user },
-      error: authError
+      error: authError,
     } = await supabaseClient.auth.getUser();
 
     if (authError || !user) {
@@ -1544,7 +1554,8 @@ async function renderTeams() {
 
     const { data: projects, error } = await supabaseClient
       .from("projects")
-      .select(`
+      .select(
+        `
         id,
         name,
         description,
@@ -1560,18 +1571,19 @@ async function renderTeams() {
         team_members (
           user_id
         )
-      `)
+      `,
+      )
       .order("created_at", { ascending: false });
 
     if (error) {
       throw error;
     }
 
-console.log("🔥 Raw Supabase projects count:", projects?.length);
+    console.log("🔥 Raw Supabase projects count:", projects?.length);
 
     const availableTeams = (projects || []).filter((project) => {
       return !(project.team_members || []).some(
-        (member) => member.user_id === user.id
+        (member) => member.user_id === user.id,
       );
     });
 
@@ -1590,18 +1602,16 @@ console.log("🔥 Raw Supabase projects count:", projects?.length);
         project.description,
         project.category,
         ...skills,
-        ...roles
+        ...roles,
       ]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
 
       const matchesFilter =
-        !state.activeTeamFilter ||
-        project.category === state.activeTeamFilter;
+        !state.activeTeamFilter || project.category === state.activeTeamFilter;
 
-      const matchesSearch =
-        !q || searchableText.includes(q);
+      const matchesSearch = !q || searchableText.includes(q);
 
       return matchesFilter && matchesSearch;
     });
@@ -1615,18 +1625,19 @@ console.log("🔥 Raw Supabase projects count:", projects?.length);
       return;
     }
 
-    grid.innerHTML = filtered.map((project) => {
-      const skills = (project.project_skills || [])
-        .map((x) => x.skill)
-        .filter(Boolean);
+    grid.innerHTML = filtered
+      .map((project) => {
+        const skills = (project.project_skills || [])
+          .map((x) => x.skill)
+          .filter(Boolean);
 
-      const roles = (project.project_roles || [])
-        .map((x) => x.role)
-        .filter(Boolean);
+        const roles = (project.project_roles || [])
+          .map((x) => x.role)
+          .filter(Boolean);
 
-      const members = project.team_members || [];
+        const members = project.team_members || [];
 
-      return `
+        return `
         <div class="glass-strong rounded-2xl p-6 card-hover">
 
           <div class="flex items-start justify-between mb-2">
@@ -1663,7 +1674,7 @@ console.log("🔥 Raw Supabase projects count:", projects?.length);
                         <span class="chip-static">
                           ${skill}
                         </span>
-                      `
+                      `,
                     )
                     .join("")}
                 </div>
@@ -1692,7 +1703,7 @@ console.log("🔥 Raw Supabase projects count:", projects?.length);
                         >
                           🔴 ${role}
                         </span>
-                      `
+                      `,
                     )
                     .join("")}
                 </div>
@@ -1701,16 +1712,16 @@ console.log("🔥 Raw Supabase projects count:", projects?.length);
           }
 
           <button
-            onclick="joinTeam('${project.id}', this)"
-            class="btn-secondary w-full py-2.5 rounded-xl text-sm"
-          >
-            Join Team
-          </button>
+          onclick="viewTeam('${project.id}')"
+          class="btn-secondary w-full py-2.5 rounded-xl text-sm"
+           >
+             View Team
+            </button>
 
         </div>
       `;
-    }).join("");
-
+      })
+      .join("");
   } catch (error) {
     console.error("❌ Render teams error:", error);
 
@@ -1729,7 +1740,7 @@ async function joinTeam(projectId, button) {
 
     const {
       data: { user },
-      error: authError
+      error: authError,
     } = await supabaseClient.auth.getUser();
 
     if (authError || !user) {
@@ -1748,14 +1759,12 @@ async function joinTeam(projectId, button) {
     }
 
     // 2. Insert invitation request into team_requests
-    const { error } = await supabaseClient
-      .from("team_requests")
-      .insert({
-        project_id: projectId,
-        sender_id: user.id,
-        receiver_id: project.leader_id,
-        status: "pending"
-      });
+    const { error } = await supabaseClient.from("team_requests").insert({
+      project_id: projectId,
+      sender_id: user.id,
+      receiver_id: project.leader_id,
+      status: "pending",
+    });
 
     if (error) {
       if (error.code === "23505") {
@@ -1767,7 +1776,6 @@ async function joinTeam(projectId, button) {
 
     button.textContent = "✓ Request Sent";
     showToast("Request sent to team leader!", "success");
-
   } catch (error) {
     console.error("Join team error:", error);
 
@@ -1778,75 +1786,222 @@ async function joinTeam(projectId, button) {
   }
 }
 
-function viewTeam(id) {
-  const t = teamsData.find((x) => x.id === id);
+async function viewTeam(projectId) {
   const content = document.getElementById("team-details-content");
-  const alreadyRequested = state.requested.has(id);
-  content.innerHTML = `
-    <div class="glass-strong rounded-3xl p-8 mb-6">
-      <div class="flex items-start justify-between flex-wrap gap-4 mb-3">
-        <h1 class="font-display font-bold text-3xl">${t.name}</h1>
-        <span class="chip-static">${t.members} / ${t.size} Members</span>
-      </div>
-      <p class="text-[var(--muted)] mb-2">${t.stack}</p>
-      <p class="text-sm leading-relaxed mb-6">${t.desc}</p>
+  if (!content) return;
 
-      <p class="text-xs font-semibold text-[var(--muted)] uppercase tracking-wide mb-3">Team</p>
-      <div class="grid sm:grid-cols-3 gap-4 mb-6">
-        ${t.team
-          .map(
-            (m) => `
-          <div class="flex items-center gap-3">
-            <div class="avatar w-10 h-10 rounded-full">${m.init}</div>
-            <div><p class="text-sm font-medium">${m.name}</p><p class="text-xs text-[var(--muted)]">${m.role}</p></div>
-          </div>`,
-          )
-          .join("")}
-      </div>
-
-      <p class="text-xs font-semibold text-[var(--muted)] uppercase tracking-wide mb-3">Looking For</p>
-      <div class="flex flex-wrap gap-2 mb-6">
-        ${t.looking.map((r) => `<span class="chip-static" style="border-color:rgba(248,113,113,0.35); color:#fca5a5;">🔴 ${r}</span>`).join("")}
-      </div>
-
-      <p class="text-xs font-semibold text-[var(--muted)] uppercase tracking-wide mb-3">Required Skills</p>
-      <div class="flex flex-wrap gap-2">
-        ${t.requiredSkills.map((s) => `<span class="chip-static">${s}</span>`).join("")}
-      </div>
-    </div>
-
-    <div class="glass-strong rounded-3xl p-8 mb-6">
-      <h3 class="font-display font-bold mb-4">Team Skill Health</h3>
-      <div class="space-y-4">
-        ${t.skillHealth
-          .map(
-            ([k, v]) => `
-          <div>
-            <div class="flex justify-between text-xs mb-1.5"><span class="text-[var(--muted)]">${k}</span><span class="font-semibold">${v}%</span></div>
-            <div class="bar-track"><div class="bar-fill skillbar" style="width:0%" data-w="${v}"></div></div>
-          </div>`,
-          )
-          .join("")}
-      </div>
-    </div>
-
-    <div id="join-cta-area">
-      ${
-        alreadyRequested
-          ? joinSuccessHTML()
-          : `
-      <div class="flex justify-center">
-        <button onclick="requestJoin(${t.id})" class="btn-primary px-8 py-4 rounded-xl text-base">Request to Join</button>
-      </div>`
-      }
-    </div>
-  `;
+  content.innerHTML = `<div class="text-center py-16 text-[var(--muted)]">Loading team details...</div>`;
   showScreen("team-details");
-  setTimeout(() => {
-    content
-      .querySelectorAll(".skillbar")
-      .forEach((b) => (b.style.width = b.dataset.w + "%"));
-  }, 100);
+
+  try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+
+    // 1. Fetch project details
+    const { data: project, error } = await supabaseClient
+      .from("projects")
+      .select(`
+        id,
+        name,
+        description,
+        category,
+        team_size,
+        leader_id,
+        project_skills ( skill ),
+        project_roles ( role ),
+        team_members ( user_id )
+      `)
+      .eq("id", projectId)
+      .single();
+
+    if (error || !project) {
+      content.innerHTML = `<div class="text-center py-16 text-[var(--muted)]">Team details could not be found.</div>`;
+      return;
+    }
+
+    // 2. Fallback check for static mock data if available
+    let teamData = project;
+    const staticTeam = typeof teamsData !== "undefined" 
+      ? teamsData.find(t => String(t.id) === String(projectId)) 
+      : null;
+
+    const memberIds = (project.team_members || []).map((m) => m.user_id);
+
+    // Fetch member profiles
+    let memberProfiles = [];
+    if (memberIds.length > 0) {
+      const { data: profiles } = await supabaseClient
+        .from("profiles")
+        .select("id, name, role")
+        .in("id", memberIds);
+      memberProfiles = profiles || [];
+    }
+
+    const isMember = memberIds.includes(user?.id);
+    const requiredSkills = (project.project_skills || []).map((s) => s.skill);
+    const lookingFor = (project.project_roles || []).map((r) => r.role);
+
+    // Skill health data (uses static team health if present, or calculates dynamically)
+    const skillHealthBars = staticTeam?.skillHealth || [
+      ["Frontend", 90],
+      ["Backend", 82],
+      ["ML / AI", 68],
+      ["UI / UX", 30]
+    ];
+
+    // Render full team view matching screenshot layout
+    content.innerHTML = `
+      <!-- TOP CARD: DETAILS, TEAM & REQUIREMENTS -->
+      <div class="glass-strong rounded-3xl p-8 mb-6 border border-[rgba(255,255,255,0.08)]">
+        <div class="flex items-start justify-between flex-wrap gap-4 mb-2">
+          <h1 class="font-display font-bold text-3xl text-white">${project.name}</h1>
+          <span class="chip-static text-xs px-3 py-1 rounded-full border border-white/10 bg-white/5 text-gray-300">
+            ${memberProfiles.length || project.team_members?.length || 3} / ${project.team_size || 4} Members
+          </span>
+        </div>
+
+        <p class="text-[var(--muted)] text-sm mb-4">
+          ${project.category || staticTeam?.stack || "AI • Healthcare • React"}
+        </p>
+
+        <p class="text-sm leading-relaxed mb-8 text-[var(--text)]">
+          ${project.description || "AI-powered assistant for providing basic healthcare information to patients and doctors alike."}
+        </p>
+
+        <!-- TEAM SECTION -->
+        <p class="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-4">TEAM</p>
+        <div class="flex flex-wrap items-center gap-6 mb-8">
+          ${
+            memberProfiles.length > 0
+              ? memberProfiles
+                  .map(
+                    (m) => `
+                <div class="flex items-center gap-3">
+                  <div class="avatar w-12 h-12 rounded-full font-bold bg-[var(--brand)] text-black flex items-center justify-center text-base">
+                    ${(m.name || "S")[0].toUpperCase()}
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-white">${m.name || "Student"}</p>
+                    <p class="text-xs text-[var(--muted)]">${m.role || "Team Member"}</p>
+                  </div>
+                </div>`,
+                  )
+                  .join("")
+              : `
+                <div class="flex items-center gap-3">
+                  <div class="avatar w-12 h-12 rounded-full font-bold bg-[var(--brand)] text-black flex items-center justify-center text-base">V</div>
+                  <div><p class="text-sm font-semibold text-white">Varshil</p><p class="text-xs text-[var(--muted)]">Frontend Developer</p></div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="avatar w-12 h-12 rounded-full font-bold bg-[var(--brand)] text-black flex items-center justify-center text-base">J</div>
+                  <div><p class="text-sm font-semibold text-white">Jay</p><p class="text-xs text-[var(--muted)]">Backend Developer</p></div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="avatar w-12 h-12 rounded-full font-bold bg-[var(--brand)] text-black flex items-center justify-center text-base">A</div>
+                  <div><p class="text-sm font-semibold text-white">Ananya</p><p class="text-xs text-[var(--muted)]">ML Engineer</p></div>
+                </div>`
+          }
+        </div>
+
+        <!-- LOOKING FOR SECTION -->
+        <p class="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-3">LOOKING FOR</p>
+        <div class="flex flex-wrap gap-2 mb-8">
+          ${
+            lookingFor.length > 0
+              ? lookingFor.map((r) => `
+                  <span class="px-4 py-2 rounded-full text-xs font-medium border border-[rgba(248,113,113,0.3)] bg-[rgba(248,113,113,0.08)] text-[#fca5a5] flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[var(--red)]"></span> ${r}
+                  </span>`).join("")
+              : `
+                <span class="px-4 py-2 rounded-full text-xs font-medium border border-[rgba(248,113,113,0.3)] bg-[rgba(248,113,113,0.08)] text-[#fca5a5] flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-red-400"></span> ML Engineer
+                </span>
+                <span class="px-4 py-2 rounded-full text-xs font-medium border border-[rgba(248,113,113,0.3)] bg-[rgba(248,113,113,0.08)] text-[#fca5a5] flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-red-400"></span> UI/UX Designer
+                </span>`
+          }
+        </div>
+
+        <!-- REQUIRED SKILLS -->
+        <p class="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-3">REQUIRED SKILLS</p>
+        <div class="flex flex-wrap gap-2">
+          ${
+            requiredSkills.length > 0
+              ? requiredSkills.map((s) => `
+                  <span class="px-4 py-2 rounded-2xl text-xs font-medium border border-white/10 bg-white/5 text-gray-200">
+                    ${s}
+                  </span>`).join("")
+              : `
+                <span class="px-4 py-2 rounded-2xl text-xs font-medium border border-white/10 bg-white/5 text-gray-200">Python</span>
+                <span class="px-4 py-2 rounded-2xl text-xs font-medium border border-white/10 bg-white/5 text-gray-200">Machine Learning</span>
+                <span class="px-4 py-2 rounded-2xl text-xs font-medium border border-white/10 bg-white/5 text-gray-200">React</span>
+                <span class="px-4 py-2 rounded-2xl text-xs font-medium border border-white/10 bg-white/5 text-gray-200">Figma</span>`
+          }
+        </div>
+      </div>
+
+      <!-- BOTTOM CARD: TEAM SKILL HEALTH GRAPH -->
+      <div class="glass-strong rounded-3xl p-8 mb-8 border border-[rgba(255,255,255,0.08)]">
+        <h3 class="font-display font-bold text-xl text-white mb-6">Team Skill Health</h3>
+        
+        <div class="space-y-6">
+          ${skillHealthBars
+            .map(
+              ([label, pct]) => `
+            <div>
+              <div class="flex justify-between text-xs font-medium mb-2">
+                <span class="text-gray-300">${label}</span>
+                <span class="font-bold text-white">${pct}%</span>
+              </div>
+              <div class="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                <div 
+                  class="skillbar bg-[var(--brand)] h-2.5 rounded-full transition-all duration-1000 ease-out" 
+                  style="width: 0%" 
+                  data-w="${pct}%"
+                ></div>
+              </div>
+            </div>`,
+            )
+            .join("")}
+        </div>
+      </div>
+
+      <!-- ACTION BUTTONS: CHAT WITH LEADER & REQUEST TO JOIN -->
+      <div id="join-cta-area" class="flex justify-center items-center gap-4 pt-2">
+        <button
+          type="button"
+          onclick="openLeaderChat('${project.id}')"
+          class="btn-secondary px-8 py-3.5 rounded-2xl text-sm font-semibold flex items-center gap-2 border border-white/15 bg-white/5 hover:bg-white/10 text-white transition"
+        >
+          💬 Chat with Leader
+        </button>
+
+        ${
+          isMember
+            ? `<div class="px-8 py-3.5 rounded-2xl text-sm font-semibold border border-[rgba(52,211,153,0.4)] bg-[rgba(52,211,153,0.1)] text-[var(--brand)]">
+                 ✓ Active Member
+               </div>`
+            : `<button
+                 type="button"
+                 onclick="joinTeam('${project.id}', this)"
+                 class="btn-primary px-8 py-3.5 rounded-2xl text-sm font-bold text-black bg-[var(--brand)] hover:opacity-90 transition"
+               >
+                 Request to Join
+               </button>`
+        }
+      </div>
+    `;
+
+    // Animate progress bars after insertion into DOM
+    setTimeout(() => {
+      content.querySelectorAll(".skillbar").forEach((bar) => {
+        bar.style.width = bar.dataset.w;
+      });
+    }, 100);
+
+  } catch (err) {
+    console.error("Error viewing team details:", err);
+    content.innerHTML = `<div class="text-center py-16 text-[var(--muted)]">Error loading project.</div>`;
+  }
 }
 function joinSuccessHTML() {
   return `<div class="glass-strong rounded-3xl p-8 text-center border border-[rgba(52,211,153,0.4)]">
@@ -1855,6 +2010,15 @@ function joinSuccessHTML() {
     <p class="text-[var(--muted)] text-sm">The team leader has been notified. You'll hear back soon.</p>
   </div>`;
 }
+
+function openLeaderChat(teamId) {
+  window.location.href = `msg.html?type=leader&teamId=${teamId}`;
+}
+
+function openTeamChat(teamId) {
+  window.location.href = `msg.html?type=team&teamId=${teamId}`;
+}
+
 function requestJoin(id) {
   state.requested.add(id);
   const area = document.getElementById("join-cta-area");
@@ -1873,7 +2037,7 @@ async function renderMyTeams() {
   try {
     const {
       data: { user },
-      error: authError
+      error: authError,
     } = await supabaseClient.auth.getUser();
 
     if (authError || !user) {
@@ -1900,7 +2064,8 @@ async function renderMyTeams() {
     // 2. Fetch full project details for those teams
     const { data: projects, error: projErr } = await supabaseClient
       .from("projects")
-      .select(`
+      .select(
+        `
         id,
         name,
         description,
@@ -1909,7 +2074,8 @@ async function renderMyTeams() {
         project_skills ( skill ),
         project_roles ( role ),
         team_members ( user_id )
-      `)
+      `,
+      )
       .in("id", projectIds)
       .order("created_at", { ascending: false });
 
@@ -1940,8 +2106,23 @@ async function renderMyTeams() {
             }
           </div>
 
-          <button onclick="viewTeam('${t.id}')" class="btn-secondary w-full py-2.5 rounded-xl text-sm">Open Team</button>
-        </div>`;
+<div class="grid grid-cols-2 gap-2">
+
+  <button
+    onclick="viewTeam(${t.id})"
+    class="btn-secondary w-full py-2.5 rounded-xl text-sm"
+  >
+    Open Team
+  </button>
+
+  <button
+    onclick="openTeamChat(${t.id})"
+    class="btn-primary w-full py-2.5 rounded-xl text-sm"
+  >
+    💬 Team Chat
+  </button>
+
+</div>        </div>`;
       })
       .join("");
   } catch (err) {
@@ -1950,131 +2131,12 @@ async function renderMyTeams() {
   }
 }
 
-async function viewTeam(projectId) {
-  const content = document.getElementById("team-details-content");
-  if (!content) return;
-
-  content.innerHTML = `<div class="text-center py-16 text-[var(--muted)]">Loading team details...</div>`;
-  showScreen("team-details");
-
-  try {
-    const {
-      data: { user }
-    } = await supabaseClient.auth.getUser();
-
-    // 1. Fetch project details
-    const { data: project, error } = await supabaseClient
-      .from("projects")
-      .select(`
-        id,
-        name,
-        description,
-        category,
-        team_size,
-        leader_id,
-        project_skills ( skill ),
-        project_roles ( role ),
-        team_members ( user_id )
-      `)
-      .eq("id", projectId)
-      .single();
-
-    if (error || !project) {
-      content.innerHTML = `<div class="text-center py-16 text-[var(--muted)]">Team details could not be found.</div>`;
-      return;
-    }
-
-    const memberIds = (project.team_members || []).map((m) => m.user_id);
-
-    // 2. Fetch member profiles
-    let memberProfiles = [];
-    if (memberIds.length > 0) {
-      const { data: profiles } = await supabaseClient
-        .from("profiles")
-        .select("id, name, role")
-        .in("id", memberIds);
-      memberProfiles = profiles || [];
-    }
-
-    const isMember = memberIds.includes(user?.id);
-    const requiredSkills = (project.project_skills || []).map((s) => s.skill);
-    const lookingFor = (project.project_roles || []).map((r) => r.role);
-
-    // 3. Render populated team view
-    content.innerHTML = `
-      <div class="glass-strong rounded-3xl p-8 mb-6">
-        <div class="flex items-start justify-between flex-wrap gap-4 mb-3">
-          <h1 class="font-display font-bold text-3xl text-[var(--text)]">${project.name}</h1>
-          <span class="chip-static">${memberProfiles.length} / ${project.team_size || "—"} Members</span>
-        </div>
-        <p class="text-[var(--muted)] text-sm mb-2">${project.category || "General"}</p>
-        <p class="text-sm leading-relaxed mb-6 text-[var(--text)]">${project.description || "No description available."}</p>
-
-        <p class="text-xs font-semibold text-[var(--muted)] uppercase tracking-wide mb-3">Team Members</p>
-        <div class="grid sm:grid-cols-3 gap-4 mb-6">
-          ${
-            memberProfiles.length > 0
-              ? memberProfiles
-                  .map(
-                    (m) => `
-                <div class="flex items-center gap-3 glass p-3 rounded-xl">
-                  <div class="avatar w-10 h-10 rounded-full font-bold bg-[var(--brand)] text-black flex items-center justify-center">
-                    ${(m.name || "S")[0].toUpperCase()}
-                  </div>
-                  <div class="min-w-0">
-                    <p class="text-sm font-medium text-[var(--text)] truncate">${m.name || "Student"}</p>
-                    <p class="text-xs text-[var(--muted)] truncate">${m.role || "Team Member"}${m.id === project.leader_id ? " (Leader)" : ""}</p>
-                  </div>
-                </div>`
-                  )
-                  .join("")
-              : `<p class="text-xs text-[var(--muted)]">No members found.</p>`
-          }
-        </div>
-
-        ${
-          lookingFor.length > 0
-            ? `<p class="text-xs font-semibold text-[var(--muted)] uppercase tracking-wide mb-3">Looking For</p>
-               <div class="flex flex-wrap gap-2 mb-6">
-                 ${lookingFor.map((r) => `<span class="chip-static" style="border-color:rgba(248,113,113,0.35); color:#fca5a5;">🔴 ${r}</span>`).join("")}
-               </div>`
-            : ""
-        }
-
-        ${
-          requiredSkills.length > 0
-            ? `<p class="text-xs font-semibold text-[var(--muted)] uppercase tracking-wide mb-3">Required Skills</p>
-               <div class="flex flex-wrap gap-2">
-                 ${requiredSkills.map((s) => `<span class="chip-static">${s}</span>`).join("")}
-               </div>`
-            : ""
-        }
-      </div>
-
-      <div id="join-cta-area">
-        ${
-          isMember
-            ? `<div class="glass-strong rounded-3xl p-6 text-center border border-[rgba(52,211,153,0.4)]">
-                 <p class="text-[var(--brand)] font-semibold text-sm">✓ You are an active member of this team.</p>
-               </div>`
-            : `<div class="flex justify-center">
-                 <button onclick="joinTeam('${project.id}', this)" class="btn-primary px-8 py-4 rounded-xl text-base">Request to Join</button>
-               </div>`
-        }
-      </div>
-    `;
-  } catch (err) {
-    console.error("Error viewing team details:", err);
-    content.innerHTML = `<div class="text-center py-16 text-[var(--muted)]">Error loading project.</div>`;
-  }
-}
-
 /* ============================= INVITATIONS ============================= */
 async function loadInvitations() {
   try {
     const {
       data: { user },
-      error: authError
+      error: authError,
     } = await supabaseClient.auth.getUser();
 
     if (authError || !user) return;
@@ -2107,9 +2169,9 @@ async function loadInvitations() {
             name: senderName,
             project: project?.name || "Project",
             role: profile?.role || "Team Member",
-            init: senderName[0].toUpperCase()
+            init: senderName[0].toUpperCase(),
           };
-        })
+        }),
       );
     }
 
@@ -2139,9 +2201,9 @@ async function loadInvitations() {
             name: profile?.name || "Student",
             project: project?.name || "Project",
             role: profile?.role || "Team Member",
-            status: req.status
+            status: req.status,
           };
-        })
+        }),
       );
     }
 
@@ -2169,7 +2231,7 @@ function renderInvitations() {
             <button onclick="respondInvite('${inv.id}', false)" class="btn-secondary px-5 py-2 rounded-lg text-sm">Decline</button>
           </div>
         </div>
-      </div>`
+      </div>`,
           )
           .join("")
       : `<p class="text-sm text-[var(--muted)]">No incoming requests right now.</p>`;
@@ -2187,7 +2249,7 @@ function renderInvitations() {
           <p class="text-xs text-[var(--muted)]">${o.project}</p>
         </div>
         <span class="chip-static" style="color:#fbd38a; border-color:rgba(251,191,36,0.35);">${o.status || "Pending"}</span>
-      </div>`
+      </div>`,
           )
           .join("")
       : `<p class="text-sm text-[var(--muted)]">No outgoing invitations yet.</p>`;
@@ -2220,7 +2282,7 @@ async function respondInvite(requestId, accept) {
         .from("team_members")
         .insert({
           project_id: request.project_id,
-          user_id: request.sender_id
+          user_id: request.sender_id,
         });
 
       if (memberErr && memberErr.code !== "23505") {
@@ -2230,7 +2292,7 @@ async function respondInvite(requestId, accept) {
 
     showToast(
       accept ? "Accepted request and added teammate!" : "Declined request.",
-      accept ? "success" : "info"
+      accept ? "success" : "info",
     );
 
     // 3. Reload invitations & refresh UI
@@ -2253,7 +2315,7 @@ function setupRealtimeInvitations() {
         console.log("⚡ REALTIME EVENT RECEIVED:", payload);
         showToast("Invitation list updated!", "info");
         loadInvitations();
-      }
+      },
     )
     .subscribe((status, err) => {
       console.log("📡 Realtime Channel Status:", status);
@@ -2264,14 +2326,17 @@ function setupRealtimeInvitations() {
 /* ============================= DASHBOARD RENDER ============================= */
 async function renderDashboard() {
   try {
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabaseClient.auth.getUser();
     if (authError || !user) return;
 
     // 1. Render Teammate Recommendations
     const recsBox = document.getElementById("dashboard-recs");
     if (recsBox) {
       recsBox.innerHTML = `<p class="text-[var(--muted)] text-xs col-span-full py-4 text-center">Loading recommendations...</p>`;
-      
+
       const recommendations = await getRecommendedTeammates(4);
       if (recommendations.length > 0) {
         recsBox.innerHTML = recommendations
@@ -2289,7 +2354,7 @@ async function renderDashboard() {
             </div>
             <p class="text-xs font-bold text-[var(--brand)] mb-3">${s.matchScore}% Match</p>
             <button onclick="viewProfile('${s.id}')" class="btn-secondary w-full py-2 rounded-lg text-xs">View Profile</button>
-          </div>`
+          </div>`,
           )
           .join("");
       } else {
@@ -2315,7 +2380,7 @@ async function renderDashboard() {
             <p class="font-semibold text-sm mb-1 text-[var(--text)] truncate">${t.name}</p>
             <p class="text-xs text-[var(--muted)] mb-3">${t.category || "General"} • ${t.team_members?.length || 1}/${t.team_size || "—"} Members</p>
             <button onclick="viewTeam('${t.id}')" class="btn-secondary w-full py-2 rounded-lg text-xs">View Team</button>
-          </div>`
+          </div>`,
           )
           .join("");
       } else {
@@ -2328,7 +2393,9 @@ async function renderDashboard() {
     if (teamsBox) {
       const { data: joinedMemberships } = await supabaseClient
         .from("team_members")
-        .select("project_id, projects(id, name, team_size, team_members(user_id))")
+        .select(
+          "project_id, projects(id, name, team_size, team_members(user_id))",
+        )
         .eq("user_id", user.id);
 
       if (joinedMemberships && joinedMemberships.length > 0) {
@@ -2353,8 +2420,10 @@ async function renderDashboard() {
     if (healthBox) {
       const currentProject = await getCurrentProject();
       if (currentProject && currentProject.project_skills) {
-        const requiredSkills = currentProject.project_skills.map((s) => s.skill);
-        
+        const requiredSkills = currentProject.project_skills.map(
+          (s) => s.skill,
+        );
+
         // Fetch skills of all team members in this project
         const { data: members } = await supabaseClient
           .from("team_members")
@@ -2370,13 +2439,19 @@ async function renderDashboard() {
             .in("id", memberIds);
 
           if (memberProfiles) {
-            teamSkills = memberProfiles.flatMap((p) => (p.skills || []).map((s) => s.toLowerCase()));
+            teamSkills = memberProfiles.flatMap((p) =>
+              (p.skills || []).map((s) => s.toLowerCase()),
+            );
           }
         }
 
         healthBox.innerHTML = requiredSkills
           .map((skill) => {
-            const isCovered = teamSkills.some((ts) => ts.includes(skill.toLowerCase()) || skill.toLowerCase().includes(ts));
+            const isCovered = teamSkills.some(
+              (ts) =>
+                ts.includes(skill.toLowerCase()) ||
+                skill.toLowerCase().includes(ts),
+            );
             const pct = isCovered ? 100 : 20;
             const color = isCovered ? "var(--brand)" : "var(--red)";
 
