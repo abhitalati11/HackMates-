@@ -1,0 +1,1046 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TeamForge</title>
+    <link rel="shortcut icon" href="imgs/logo.png" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="css/index.css" rel="stylesheet" />
+  </head>
+
+  <body class="bg-noise antialiased relative">
+    <div class="glow-blob blob-1"></div>
+
+    <div class="relative z-10">
+      <!-- NAV -->
+      <nav
+        class="max-w-7xl mx-auto flex items-center justify-between px-6 md:px-10 py-6"
+      >
+        <div class="flex items-center gap-3">
+          <div
+            class="w-8 h-8 rounded bg-[var(--brand)] flex items-center justify-center text-black font-bold"
+          >
+            <img src="imgs/logo.png" alt="" />
+          </div>
+          <span
+            class="font-display font-extrabold text-xl tracking-tight text-white"
+            >TeamForge</span
+          >
+        </div>
+        <div
+          class="hidden md:flex items-center gap-8 text-sm text-[var(--muted)] font-medium"
+        >
+          <!-- Anchor links updated to target section IDs -->
+          <a href="#how-it-works" class="hover:text-white transition"
+            >How It Works</a
+          >
+          <a href="#ai-matching" class="hover:text-white transition"
+            >AI Matching</a
+          >
+          <a href="#use-cases" class="hover:text-white transition">Use Cases</a>
+          <a href="#explore-teams" class="hover:text-white transition"
+            >Explore Teams</a
+          >
+        </div>
+        <div class="flex items-center gap-4">
+          <button
+            type="button"
+            onclick="openLogin()"
+            class="hidden sm:inline-block text-sm font-medium text-[var(--text)] hover:text-[var(--brand)] transition"
+          >
+            Log in
+          </button>
+          <button
+            type="button"
+            onclick="openSignup()"
+            class="btn-primary text-sm px-5 py-2.5 rounded-full"
+          >
+            Get Started
+          </button>
+        </div>
+      </nav>
+
+      <!-- HERO -->
+      <header
+        class="max-w-4xl mx-auto text-center px-6 pt-24 pb-20 md:pt-32 md:pb-28"
+      >
+        <h1
+          class="font-display font-extrabold text-5xl sm:text-6xl md:text-[80px] leading-[1.05] tracking-tight mb-6 text-white"
+        >
+          Stop building teams <span class="text-[var(--brand)]">randomly.</span>
+        </h1>
+        <p
+          class="text-[var(--muted)] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10"
+        >
+          Start building teams with purpose, compatibility and the right skills.
+        </p>
+        <div
+          class="flex flex-col sm:flex-row items-center justify-center gap-4"
+        >
+          <button
+            onclick="openLogin()"
+            class="btn-primary px-8 py-3.5 rounded-full text-base w-full sm:w-auto flex items-center justify-center gap-2"
+          >
+            🚀 Build My Team
+      </button>
+          <button
+            onclick="openLogin()"
+            class="btn-secondary px-8 py-3.5 rounded-full text-base w-full sm:w-auto flex items-center justify-center gap-2"
+          >
+            🔎 Find My Team
+          </button>
+        </div>
+      </header>
+
+      <!-- EXPLAINABLE AI -->
+      <!-- Added ID for AI Matching -->
+      <section id="ai-matching" class="max-w-6xl mx-auto px-6 py-20">
+        <div class="flex flex-col md:flex-row items-center gap-16 md:gap-24">
+          <div class="w-full md:w-5/12">
+            <div
+              class="glass rounded-3xl p-8 border border-[rgba(255,255,255,0.1)] relative"
+            >
+              <div class="flex justify-between items-start mb-8">
+                <div class="flex items-center gap-4">
+                  <div
+                    class="w-12 h-12 rounded-full bg-[var(--brand)] flex items-center justify-center text-black font-bold text-lg"
+                  >
+                    AP
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-white text-lg">Arjun Patel</h4>
+                    <p class="text-xs text-[var(--muted)]">
+                      Full-Stack Developer
+                    </p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div
+                    class="text-3xl font-display font-extrabold text-[var(--brand)] leading-none"
+                  >
+                    92%
+                  </div>
+                  <div
+                    class="text-[10px] font-bold text-[var(--muted)] tracking-wider mt-1"
+                  >
+                    TEAM FIT
+                  </div>
+                </div>
+              </div>
+
+              <ul class="space-y-4 mb-8">
+                <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                  <svg
+                    class="check-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  Strong React + Node.js match
+                </li>
+                <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                  <svg
+                    class="check-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  Fills your backend skill gap
+                </li>
+                <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                  <svg
+                    class="check-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  Interested in AI projects
+                </li>
+                <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                  <svg
+                    class="check-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  Available for the hackathon
+                </li>
+              </ul>
+
+              <div class="flex gap-3">
+                <button 
+                  class="flex-1 bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.1)] transition rounded-full py-3 text-sm font-semibold text-white border border-[rgba(255,255,255,0.1)]"
+                >
+                  View Profile →
+                </button>
+                <button
+                  class="flex-1 btn-primary rounded-full py-3 text-sm font-semibold"
+                >
+                  Invite to Team
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="w-full md:w-7/12">
+            <p
+              class="text-[var(--brand)] text-xs font-bold tracking-[0.2em] uppercase mb-4"
+            >
+              EXPLAINABLE AI
+            </p>
+            <h2
+              class="font-display font-bold text-4xl md:text-[52px] mb-8 text-white leading-tight"
+            >
+              Know <span class="text-[var(--brand)]">why</span> someone fits.
+            </h2>
+            <p
+              class="text-[var(--text)] text-base md:text-lg mb-6 leading-relaxed"
+            >
+              TeamForge doesn't just show a list of names. Every recommendation
+              can explain the factors that make someone a strong match for your
+              project.
+            </p>
+            <p class="text-[var(--muted)] text-base md:text-lg leading-relaxed">
+              Every match is backed by weighed, transparent signals — not a
+              black box.<br /><br />
+              See exactly which skills, gaps, and interests contributed to the
+              score.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- FIND PEOPLE / OPPORTUNITIES -->
+      <!-- Added ID for How It Works -->
+      <section id="how-it-works" class="max-w-6xl mx-auto px-6 py-24">
+        <h2
+          class="text-center font-display font-extrabold text-4xl md:text-[52px] mb-16 leading-tight"
+        >
+          Find people.
+          <span class="text-[var(--brand)]">Find<br />opportunities.</span>
+        </h2>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <div
+            class="glass rounded-3xl p-8 md:p-10 card-hover flex flex-col h-full border border-[rgba(255,255,255,0.1)]"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-[rgba(255,255,255,0.05)] flex items-center justify-center text-xl mb-6 border border-[rgba(255,255,255,0.05)]"
+            >
+              🚀
+            </div>
+            <h3 class="font-display font-bold text-2xl mb-4 text-white">
+              I'm Building a Team
+            </h3>
+            <p class="text-[var(--muted)] mb-8 leading-relaxed text-sm">
+              You have an idea and some teammates. TeamForge helps identify
+              what's missing and find the people who can fill it.
+            </p>
+            <ul class="space-y-4 mb-10 mt-auto">
+              <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                <svg
+                  class="check-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+                Define project requirements.
+              </li>
+              <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                <svg
+                  class="check-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+                Identify missing skills.
+              </li>
+              <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                <svg
+                  class="check-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+                Analyze your current team
+              </li>
+              <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                <svg
+                  class="check-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+                Discover compatible candidates
+              </li>
+            </ul>
+            <button
+              onclick="openLogin()"
+              class="w-full btn-primary py-4 rounded-full text-sm font-bold flex justify-center items-center"
+            >
+              Create Your Team →
+            </button>
+          </div>
+
+          <div
+            class="glass rounded-3xl p-8 md:p-10 card-hover flex flex-col h-full border border-[rgba(255,255,255,0.1)]"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-[rgba(255,255,255,0.05)] flex items-center justify-center text-xl mb-6 border border-[rgba(255,255,255,0.05)]"
+            >
+              🔎
+            </div>
+            <h3 class="font-display font-bold text-2xl mb-4 text-white">
+              I'm Looking for a Team
+            </h3>
+            <p class="text-[var(--muted)] mb-8 leading-relaxed text-sm">
+              You have the skills. TeamForge helps you discover projects where
+              your abilities can make an impact.
+            </p>
+            <ul class="space-y-4 mb-10 mt-auto">
+              <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                <svg
+                  class="check-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+                Explore active projects.
+              </li>
+              <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                <svg
+                  class="check-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+                Match with relevant teams
+              </li>
+              <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                <svg
+                  class="check-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+                See your compatibility
+              </li>
+              <li class="flex gap-3 text-sm text-[var(--text)] font-medium">
+                <svg
+                  class="check-icon"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
+                </svg>
+                Request to join
+              </li>
+            </ul>
+            <button
+              onclick="openLogin()"
+              class="w-full btn-primary py-4 rounded-full text-sm font-bold flex justify-center items-center"
+            >
+              Find Your Team →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- BUILT FOR REAL PROJECTS -->
+      <!-- Added ID for Use Cases -->
+      <section id="use-cases" class="max-w-6xl mx-auto px-6 py-24 text-center">
+        <p
+          class="text-[var(--brand)] text-xs font-bold tracking-[0.2em] uppercase mb-4"
+        >
+          BUILT FOR REAL PROJECTS
+        </p>
+        <h2
+          class="font-display font-extrabold text-4xl md:text-[52px] mb-16 leading-tight"
+        >
+          Wherever students
+          <span class="text-[var(--brand)]">build<br />together.</span>
+        </h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div
+            class="glass p-8 rounded-3xl text-left card-hover border border-[rgba(255,255,255,0.06)]"
+          >
+            <div class="text-2xl mb-6">🏆</div>
+            <h4 class="text-white font-bold mb-3 text-sm">Hackathons</h4>
+            <p class="text-xs text-[var(--muted)] leading-relaxed">
+              Find the exact skills your idea needs before the competition
+              begins.
+            </p>
+          </div>
+          <div
+            class="glass p-8 rounded-3xl text-left card-hover border border-[rgba(255,255,255,0.06)]"
+          >
+            <div class="text-2xl mb-6">📚</div>
+            <h4 class="text-white font-bold mb-3 text-sm">College Projects</h4>
+            <p class="text-xs text-[var(--muted)] leading-relaxed">
+              Build balanced teams instead of assigning roles randomly.
+            </p>
+          </div>
+          <div
+            class="glass p-8 rounded-3xl text-left card-hover border border-[rgba(255,255,255,0.06)]"
+          >
+            <div class="text-2xl mb-6">💡</div>
+            <h4 class="text-white font-bold mb-3 text-sm">Student Startups</h4>
+            <p class="text-xs text-[var(--muted)] leading-relaxed">
+              Connect with complementary talent across technology, design and
+              business.
+            </p>
+          </div>
+          <div
+            class="glass p-8 rounded-3xl text-left card-hover border border-[rgba(255,255,255,0.06)]"
+          >
+            <div class="text-2xl mb-6">🤝</div>
+            <h4 class="text-white font-bold mb-3 text-sm">
+              Open Collaboration
+            </h4>
+            <p class="text-xs text-[var(--muted)] leading-relaxed">
+              Discover students interested in building similar projects.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- BUILD TEAMS INTENTIONALLY -->
+      <!-- Added ID for Explore Teams -->
+      <section id="explore-teams" class="max-w-6xl mx-auto px-6 py-24 mb-10">
+        <div class="flex flex-col lg:flex-row gap-16 items-start">
+          <div class="lg:w-1/2 pt-4">
+            <h2
+              class="font-display font-extrabold text-4xl md:text-[52px] mb-6 leading-tight"
+            >
+              Build teams
+              <span class="text-[var(--brand)]">intentionally.</span>
+            </h2>
+            <p class="text-[var(--muted)] text-base md:text-lg leading-relaxed">
+              The best teams aren't built by randomly putting people together.
+              They're built by understanding strengths, identifying gaps and
+              finding complementary talent.
+            </p>
+          </div>
+
+          <div class="lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div
+              class="glass p-8 rounded-2xl border border-[rgba(255,255,255,0.06)]"
+            >
+              <div class="text-[var(--brand)] text-xs font-bold mb-3">01</div>
+              <h4 class="text-white font-bold mb-3 text-sm">Intelligent</h4>
+              <p class="text-xs text-[var(--muted)] leading-relaxed">
+                Multi-factor matching instead of simple keyword search.
+              </p>
+            </div>
+            <div
+              class="glass p-8 rounded-2xl border border-[rgba(255,255,255,0.06)]"
+            >
+              <div class="text-[var(--brand)] text-xs font-bold mb-3">02</div>
+              <h4 class="text-white font-bold mb-3 text-sm">Transparent</h4>
+              <p class="text-xs text-[var(--muted)] leading-relaxed">
+                Understand why someone is recommended.
+              </p>
+            </div>
+            <div
+              class="glass p-8 rounded-2xl border border-[rgba(255,255,255,0.06)]"
+            >
+              <div class="text-[var(--brand)] text-xs font-bold mb-3">03</div>
+              <h4 class="text-white font-bold mb-3 text-sm">
+                Skill-Gap Driven
+              </h4>
+              <p class="text-xs text-[var(--muted)] leading-relaxed">
+                Prioritize the capabilities the team actually needs.
+              </p>
+            </div>
+            <div
+              class="glass p-8 rounded-2xl border border-[rgba(255,255,255,0.06)]"
+            >
+              <div class="text-[var(--brand)] text-xs font-bold mb-3">04</div>
+              <h4 class="text-white font-bold mb-3 text-sm">Fast</h4>
+              <p class="text-xs text-[var(--muted)] leading-relaxed">
+                Go from project idea to potential teammates in minutes.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== LOGIN ===================== -->
+      <div id="login-overlay" class="signup-overlay" aria-hidden="true">
+        <div
+          class="signup-card login-card"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="login-title"
+        >
+          <div class="flex items-center justify-between mb-7">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-9 h-9 rounded-lg bg-[var(--brand)] flex items-center justify-center text-black font-bold"
+              >
+                <img src="imgs/logo.png" alt="">
+              </div>
+              <span class="font-display font-extrabold text-lg text-white"
+                >TeamForge</span
+              >
+            </div>
+            <button
+              type="button"
+              onclick="closeLogin()"
+              class="w-9 h-9 rounded-full btn-secondary flex items-center justify-center text-lg"
+              aria-label="Close"
+            >
+              ×
+            </button>
+          </div>
+
+          <div class="mb-7">
+            <p
+              class="text-[var(--brand)] text-[10px] font-bold tracking-[0.2em] uppercase mb-2"
+            >
+              WELCOME BACK
+            </p>
+            <h2
+              id="login-title"
+              class="font-display font-extrabold text-3xl md:text-4xl text-white mb-2"
+            >
+              Log in to TeamForge
+            </h2>
+            <p class="text-[var(--muted)] text-sm leading-relaxed">
+              Continue building the right team with your saved profile.
+            </p>
+          </div>
+
+          <div id="login-message" class="login-message" role="alert"></div>
+
+          <form id="login-form" onsubmit="completeLogin(event)">
+            <div class="mb-5">
+              <label class="signup-label" for="login-email">Email</label>
+              <input
+                id="login-email"
+                name="email"
+                type="email"
+                class="signup-input"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+              />
+            </div>
+
+            <div class="mb-3">
+              <label class="signup-label" for="login-password">Password</label>
+              <input
+                id="login-password"
+                name="password"
+                type="password"
+                class="signup-input"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+              />
+            </div>
+
+            <div class="flex justify-end mb-7">
+              <button
+                type="button"
+                onclick="showLoginHelp()"
+                class="text-xs font-semibold text-[var(--muted)] hover:text-[var(--brand)] transition"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            <div
+              class="flex flex-col gap-3 pt-5 border-t border-[rgba(255,255,255,.07)]"
+            >
+              <button
+                type="submit"
+                class="btn-primary w-full px-7 py-3.5 rounded-full text-sm"
+              >
+                Log in to TeamForge →
+              </button>
+
+              <button
+                type="button"
+                onclick="switchToSignup()"
+                class="btn-secondary w-full px-7 py-3.5 rounded-full text-sm"
+              >
+                New to TeamForge? Create an account
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===================== SIGN UP / PROFILE SETUP ===================== -->
+      <div id="signup-overlay" class="signup-overlay" aria-hidden="true">
+        <div
+          class="signup-card"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="signup-title"
+        >
+          <div class="flex items-center justify-between mb-7">
+            <div class="flex items-center gap-3">
+              <div
+                class="w-9 h-9 rounded-lg bg-[var(--brand)] flex items-center justify-center text-black font-bold"
+              >
+                <img src="imgs/logo.png" alt="">
+              </div>
+              <span class="font-display font-extrabold text-lg text-white"
+                >TeamForge</span
+              >
+            </div>
+            <button
+              type="button"
+              onclick="closeSignup()"
+              class="w-9 h-9 rounded-full btn-secondary flex items-center justify-center text-lg"
+              aria-label="Close"
+            >
+              ×
+            </button>
+          </div>
+
+          <div class="mb-7">
+            <p
+              class="text-[var(--brand)] text-[10px] font-bold tracking-[0.2em] uppercase mb-2"
+            >
+              PROFILE SETUP
+            </p>
+            <h2
+              id="signup-title"
+              class="font-display font-extrabold text-3xl md:text-4xl text-white mb-2"
+            >
+              Set up your profile
+            </h2>
+            <p class="text-[var(--muted)] text-sm leading-relaxed">
+              This helps our AI match you with the right teams and teammates.
+            </p>
+          </div>
+
+          <form id="signup-form" onsubmit="completeSignup(event)">
+            <div class="grid md:grid-cols-2 gap-4 mb-5">
+              <div>
+                <label class="signup-label" for="signup-email">Email</label>
+                <input
+                  id="signup-email"
+                  name="email"
+                  type="email"
+                  class="signup-input"
+                  placeholder="you@example.com"
+                  required
+                />
+              </div>
+              <div>
+                <label class="signup-label" for="signup-password"
+                  >Password</label
+                >
+                <input
+                  id="signup-password"
+                  name="password"
+                  type="password"
+                  class="signup-input"
+                  placeholder="Create a password"
+                  minlength="6"
+                  required
+                />
+              </div>
+              <div>
+                <label class="signup-label" for="signup-name">Full Name</label>
+                <input
+                  id="signup-name"
+                  name="name"
+                  type="text"
+                  class="signup-input"
+                  placeholder="Your full name"
+                  required
+                />
+              </div>
+              <div>
+                <label class="signup-label" for="signup-college">College</label>
+                <input
+                  id="signup-college"
+                  name="college"
+                  type="text"
+                  class="signup-input"
+                  placeholder="Your college"
+                  required
+                />
+              </div>
+              <div>
+                <label class="signup-label" for="signup-branch">Branch</label>
+                <input
+                  id="signup-branch"
+                  name="branch"
+                  type="text"
+                  class="signup-input"
+                  placeholder="e.g. Computer Science"
+                  required
+                />
+              </div>
+              <div>
+                <label class="signup-label" for="signup-year">Year</label>
+                <select
+                  id="signup-year"
+                  name="year"
+                  class="signup-select"
+                  required
+                >
+                  <option value="" disabled selected>Select year</option>
+                  <option>1st Year</option>
+                  <option>2nd Year</option>
+                  <option>3rd Year</option>
+                  <option>4th Year</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-5">
+              <label class="signup-label"
+                >Skills
+                <span class="text-[var(--muted2)]"
+                  >(select all that apply)</span
+                ></label
+              >
+              <div class="flex flex-wrap gap-2" id="signup-skills">
+                <button type="button" class="signup-chip" data-value="React">
+                  React
+                </button>
+                <button
+                  type="button"
+                  class="signup-chip"
+                  data-value="JavaScript"
+                >
+                  JavaScript
+                </button>
+                <button type="button" class="signup-chip" data-value="HTML">
+                  HTML
+                </button>
+                <button type="button" class="signup-chip" data-value="CSS">
+                  CSS
+                </button>
+                <button type="button" class="signup-chip" data-value="Python">
+                  Python
+                </button>
+                <button
+                  type="button"
+                  class="signup-chip"
+                  data-value="Machine Learning"
+                >
+                  Machine Learning
+                </button>
+                <button type="button" class="signup-chip" data-value="UI/UX">
+                  UI/UX
+                </button>
+                <button type="button" class="signup-chip" data-value="Node.js">
+                  Node.js
+                </button>
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4 mb-5">
+              <div>
+                <label class="signup-label" for="signup-level"
+                  >Skill Level</label
+                >
+                <select
+                  id="signup-level"
+                  name="level"
+                  class="signup-select"
+                  required
+                >
+                  <option>Beginner</option>
+                  <option selected>Intermediate</option>
+                  <option>Advanced</option>
+                </select>
+              </div>
+              <div>
+                <label class="signup-label" for="signup-role"
+                  >Preferred Role</label
+                >
+                <select
+                  id="signup-role"
+                  name="role"
+                  class="signup-select"
+                  required
+                >
+                  <option>Frontend Developer</option>
+                  <option>Backend Developer</option>
+                  <option>ML Engineer</option>
+                  <option>UI/UX Designer</option>
+                  <option>Product Manager</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-5">
+              <label class="signup-label"
+                >Interests
+                <span class="text-[var(--muted2)]"
+                  >(select all that apply)</span
+                ></label
+              >
+              <div class="flex flex-wrap gap-2" id="signup-interests">
+                <button type="button" class="signup-chip" data-value="Web Dev">
+                  Web Dev
+                </button>
+                <button type="button" class="signup-chip" data-value="AI">
+                  AI
+                </button>
+                <button
+                  type="button"
+                  class="signup-chip"
+                  data-value="Healthcare"
+                >
+                  Healthcare
+                </button>
+                <button type="button" class="signup-chip" data-value="FinTech">
+                  FinTech
+                </button>
+                <button
+                  type="button"
+                  class="signup-chip"
+                  data-value="Hackathons"
+                >
+                  Hackathons
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-7">
+              <label class="signup-label" for="signup-availability"
+                >Availability</label
+              >
+              <select
+                id="signup-availability"
+                name="availability"
+                class="signup-select"
+                required
+              >
+                <option>&lt;5 hrs/week</option>
+                <option selected>10–15 hrs/week</option>
+                <option>15–25 hrs/week</option>
+                <option>25+ hrs/week</option>
+              </select>
+            </div>
+
+            <div
+              class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 pt-5 border-t border-[rgba(255,255,255,.07)]"
+            >
+              <button
+                type="button"
+                onclick="closeSignup()"
+                class="btn-secondary px-6 py-3 rounded-full text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="btn-primary px-7 py-3 rounded-full text-sm"
+              >
+                Continue to TeamForge →
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="border-t border-[rgba(255,255,255,0.05)] bg-[#09090b]">
+        <div class="max-w-7xl mx-auto px-6 py-16">
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-12 mb-16">
+            <div class="col-span-1 md:col-span-2">
+              <div class="flex items-center gap-2 mb-6">
+                <div
+                  class="w-7 h-7 rounded bg-[var(--brand)] flex items-center justify-center text-black font-bold"
+                >
+                  <img src="imgs/logo.png" />
+                </div>
+                <span class="font-display font-extrabold text-lg text-white"
+                  >TeamForge</span
+                >
+              </div>
+              <p class="text-[var(--text)] text-sm mb-1 font-medium">
+                Forge the right team.
+              </p>
+              <p class="text-[var(--muted)] text-sm">Build something great.</p>
+            </div>
+
+            <div>
+              <h4
+                class="text-[10px] font-bold tracking-[0.15em] text-[var(--muted2)] uppercase mb-6"
+              >
+                PRODUCT
+              </h4>
+              <ul class="space-y-4 text-sm text-[var(--muted)]">
+                <!-- Footer links can also be updated to scroll IDs -->
+                <li>
+                  <a href="#how-it-works" class="hover:text-white transition"
+                    >How It Works</a
+                  >
+                </li>
+                <li>
+                  <a href="#ai-matching" class="hover:text-white transition"
+                    >AI Matching</a
+                  >
+                </li>
+                <li>
+                  <a href="#explore-teams" class="hover:text-white transition"
+                    >Explore Teams</a
+                  >
+                </li>
+                <li>
+                  <a href="#use-cases" class="hover:text-white transition"
+                    >Use Cases</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4
+                class="text-[10px] font-bold tracking-[0.15em] text-[var(--muted2)] uppercase mb-6"
+              >
+                GET STARTED
+              </h4>
+              <ul class="space-y-4 text-sm text-[var(--muted)]">
+                <li>
+                  <a
+                    href="main.html?mode=build"
+                    class="hover:text-white transition"
+                    >Build a Team</a
+                  >
+                </li>
+                <li>
+                  <a
+                    href="main.html?mode=find"
+                    class="hover:text-white transition"
+                    >Find a Team</a
+                  >
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onclick="openLogin()"
+                    class="hover:text-white transition text-left"
+                  >
+                    Log in
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4
+                class="text-[10px] font-bold tracking-[0.15em] text-[var(--muted2)] uppercase mb-6"
+              >
+                STAY IN THE LOOP
+              </h4>
+              <p class="text-sm text-[var(--muted)] leading-relaxed">
+                Built for student creators forging their next big project.
+              </p>
+            </div>
+          </div>
+
+          <div
+            class="text-center pt-8 border-t border-[rgba(255,255,255,0.05)] text-xs text-[var(--muted2)]"
+          >
+            © 2026 TeamForge. Built for student creators.
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/index.js"></script>
+  </body>
+</html>

@@ -1,0 +1,1085 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TeamForge</title>
+    <link rel="shortcut icon" href="imgs/logo.png" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+
+  <body class="bg-noise antialiased">
+    <div class="glow-blob blob-1"></div>
+    <div class="glow-blob blob-2"></div>
+    <div class="glow-blob blob-3"></div>
+    <!-- PAGE: APP SHELL -->
+    <!-- ============================================================ -->
+    <div id="page-app" class="page active relative z-10">
+      <div class="flex h-screen overflow-hidden">
+        <!-- SIDEBAR -->
+        <aside
+          id="sidebar"
+          class="mobile-sidebar fixed md:static z-50 -translate-x-full md:translate-x-0 top-0 left-0 h-full w-72 glass-strong border-r border-[var(--border)] flex flex-col p-5"
+        >
+          <div class="flex items-center justify-between mb-8 px-1">
+            <div
+              class="flex items-center gap-2.5 cursor-pointer"
+              onclick="showScreen('dashboard')"
+            >
+              <img 
+                src="imgs/logo.png"
+                class="w-9 h-9 rounded bg-[var(--brand)] flex items-center justify-center font-black text-black"
+              >
+              
+              <span class="font-display font-extrabold text-lg">TeamForge</span>
+            </div>
+            <button
+              class="md:hidden text-[var(--muted)]"
+              onclick="toggleSidebar(false)"
+            >
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M6 6l12 12M18 6 6 18" />
+              </svg>
+            </button>
+          </div>
+
+          <nav class="flex flex-col gap-1.5 flex-1">
+            <div
+              class="nav-item"
+              data-nav="dashboard"
+              onclick="showScreen('dashboard')"
+            >
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M3 11.5 12 4l9 7.5" />
+                <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9" />
+              </svg>
+              Dashboard
+            </div>
+            <div
+              class="nav-item"
+              data-nav="discover-teams"
+              onclick="showScreen('discover-teams')"
+            >
+              <svg class="icon" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9" />
+                <path d="m14.5 9.5-2 5-5 2 2-5z" />
+              </svg>
+              Teams
+            </div>
+            <div
+              class="nav-item"
+              data-nav="recommendations"
+              onclick="showScreen('recommendations')"
+            >
+              <svg class="icon" viewBox="0 0 24 24">
+                <circle cx="9" cy="8" r="3.2" />
+                <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
+                <circle cx="17" cy="9" r="2.6" />
+                <path d="M15.5 14.3c2.5.4 4.5 2.6 4.5 5.7" />
+              </svg>
+              Discover Teammates
+            </div>
+            <div
+              class="nav-item"
+              data-nav="my-teams"
+              onclick="showScreen('my-teams')"
+            >
+              <svg class="icon" viewBox="0 0 24 24">
+                <rect x="3" y="7" width="18" height="12" rx="2" />
+                <path
+                  d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7"
+                />
+              </svg>
+              My Teams
+            </div>
+            <div
+              class="nav-item"
+              data-nav="invitations"
+              onclick="showScreen('invitations')"
+            >
+              <svg class="icon" viewBox="0 0 24 24">
+                <path
+                  d="M6 9a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5H4.5S6 13 6 9Z"
+                />
+                <path d="M10 19a2 2 0 0 0 4 0" />
+              </svg>
+              Invitations
+              <span
+                id="invite-badge"
+                class="ml-auto text-[10px] font-bold bg-[var(--brand)] text-black rounded-full w-5 h-5 flex items-center justify-center"
+                >1</span
+              >
+            </div>
+            <div
+              class="nav-item"
+              data-nav="my-profile"
+              onclick="showScreen('my-profile')"
+            >
+              <svg class="icon" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="3.5" />
+                <path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7" />
+              </svg>
+              Profile
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-[var(--border)]">
+              <p
+                class="text-[11px] uppercase tracking-widest text-[var(--muted2)] px-2 mb-2 font-semibold"
+              >
+                Leader Flow
+              </p>
+              <div
+                class="nav-item"
+                data-nav="create-team"
+                onclick="startCreateTeamFlow()"
+              >
+                <svg class="icon" viewBox="0 0 24 24">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                Create a Team
+              </div>
+            </div>
+          </nav>
+
+          <div
+            class="pt-4 border-t border-[var(--border)] flex items-center gap-3 px-1"
+          >
+            <div
+              id="sidebar-avatar"
+              class="avatar w-9 h-9 rounded-full text-sm"
+            >
+              V
+            </div>
+            <div class="flex-1 min-w-0">
+              <p id="sidebar-name" class="text-sm font-semibold truncate">
+                Varshil Patel
+              </p>
+              <p id="sidebar-role" class="text-xs text-[var(--muted)] truncate">
+                Frontend Developer
+              </p>
+            </div>
+            <a
+              href="index.html"
+              title="Exit to landing"
+              class="text-[var(--muted)] hover:text-white transition"
+            >
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <path d="M16 17l5-5-5-5" />
+                <path d="M21 12H9" />
+              </svg>
+            </a>
+          </div>
+        </aside>
+        <div
+          id="sidebar-overlay"
+          onclick="toggleSidebar(false)"
+          class="fixed inset-0 bg-black/60 z-40 hidden md:hidden"
+        ></div>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 overflow-y-auto">
+          <!-- topbar mobile -->
+          <div
+            class="md:hidden sticky top-0 z-30 glass-strong border-b border-[var(--border)] flex items-center justify-between px-4 py-3.5"
+          >
+            <button onclick="toggleSidebar(true)" class="text-[var(--muted)]">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <div class="flex items-center gap-2">
+              <div
+                class="w-7 h-7 rounded bg-[var(--brand)] flex items-center justify-center font-black text-sm text-black"
+              >
+                ⚡
+              </div>
+              <span class="font-display font-bold text-sm">TeamForge</span>
+            </div>
+            <div class="avatar w-8 h-8 rounded-full text-xs">V</div>
+          </div>
+
+          <div class="max-w-6xl mx-auto px-5 md:px-10 py-8 md:py-10">
+            <!-- ===================== DASHBOARD ===================== -->
+            <section id="screen-dashboard" class="app-screen">
+              <div class="mb-8">
+                <h1 class="font-display font-bold text-3xl mb-1">
+                  Good afternoon,  👋
+                </h1>
+                <p class="text-[var(--muted)]">
+                  Ready to forge your next great team?
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-3 gap-4 mb-10">
+                <button
+                  onclick="startCreateTeamFlow()"
+                  class="glass-strong card-hover rounded-2xl p-5 text-left border border-[rgba(255,255,255,0.08)]"
+                >
+                  <div
+                    class="w-10 h-10 rounded-xl bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] flex items-center justify-center mb-4 text-xl"
+                  >
+                    🚀
+                  </div>
+                  <p class="font-semibold mb-1">Create a Team</p>
+                  <p class="text-xs text-[var(--muted)]">Start a new project</p>
+                </button>
+                <button
+                  onclick="showScreen('discover-teams')"
+                  class="glass-strong card-hover rounded-2xl p-5 text-left border border-[rgba(255,255,255,0.08)]"
+                >
+                  <div
+                    class="w-10 h-10 rounded-xl bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] flex items-center justify-center mb-4 text-xl"
+                  >
+                    🔎
+                  </div>
+                  <p class="font-semibold mb-1">Find a Team</p>
+                  <p class="text-xs text-[var(--muted)]">
+                    Explore active projects
+                  </p>
+                </button>
+                <button
+                  onclick="showScreen('recommendations')"
+                  class="glass-strong card-hover rounded-2xl p-5 text-left border border-[rgba(255,255,255,0.08)]"
+                >
+                  <div
+                    class="w-10 h-10 rounded-xl bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)] flex items-center justify-center mb-4 text-xl"
+                  >
+                    ✨
+                  </div>
+                  <p class="font-semibold mb-1">Discover Teammates</p>
+                  <p class="text-xs text-[var(--muted)]">AI-matched students</p>
+                </button>
+              </div>
+
+              <div class="grid lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-6">
+                  <div>
+                    <div class="flex items-center justify-between mb-4">
+                      <h2 class="font-display font-bold text-lg">
+                        ✨ AI Recommendations
+                      </h2>
+                      <button
+                        onclick="showScreen('recommendations')"
+                        class="text-xs text-[var(--brand)] font-medium hover:underline"
+                      >
+                        View all
+                      </button>
+                    </div>
+                    <div
+                      id="dashboard-recs"
+                      class="grid sm:grid-cols-3 gap-4"
+                    ></div>
+                  </div>
+
+                  <div>
+                    <h2 class="font-display font-bold text-lg mb-4">
+                      Recommended Projects
+                    </h2>
+                    <div
+                      id="dashboard-projects"
+                      class="grid sm:grid-cols-2 gap-4"
+                    ></div>
+                  </div>
+                </div>
+
+                <div class="space-y-6">
+                  <div class="glass-strong rounded-2xl p-5">
+                    <h3 class="font-display font-bold mb-4">My Teams</h3>
+                    <div id="dashboard-teams" class="space-y-3"></div>
+                  </div>
+
+                  <div class="glass-strong rounded-2xl p-5">
+                    <h3 class="font-display font-bold mb-1">
+                      Team Skill Health
+                    </h3>
+                    <p class="text-xs text-[var(--muted)] mb-4">
+                      AI Healthcare Assistant
+                    </p>
+                    <div id="dashboard-skill-health" class="space-y-3"></div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ===================== CREATE TEAM (wizard) ===================== -->
+            <section id="screen-create-team" class="app-screen max-w-3xl">
+              <h1 class="font-display font-bold text-3xl mb-2">
+                Create a Team
+              </h1>
+              <p class="text-[var(--muted)] mb-8">
+                Tell us about your project — our AI will help you build the
+                perfect team.
+              </p>
+
+              <!-- step indicator -->
+              <div class="flex items-center gap-3 mb-10">
+                <div class="flex items-center gap-2">
+                  <div
+                    id="stepdot-1"
+                    class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold bg-[var(--brand)] text-black"
+                  >
+                    1
+                  </div>
+                  <span class="text-sm font-medium">Project</span>
+                </div>
+                <div class="flex-1 h-px bg-[var(--border)]"></div>
+                <div class="flex items-center gap-2">
+                  <div
+                    id="stepdot-2"
+                    class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold border border-[var(--border)] text-[var(--muted)]"
+                  >
+                    2
+                  </div>
+                  <span class="text-sm font-medium text-[var(--muted)]"
+                    >Requirements</span
+                  >
+                </div>
+              </div>
+
+              <!-- Step 1 -->
+              <div id="ct-step-1" class="glass-strong rounded-2xl p-7 md:p-8">
+                <label class="block text-sm font-medium mb-2"
+                  >Project Name</label
+                >
+                <input
+                  id="ct-name"
+                  type="text"
+                  placeholder="e.g. AI Healthcare Assistant"
+                  value="AI Healthcare Assistant"
+                  class="w-full px-4 py-3 rounded-xl border border-[var(--border)] mb-6 text-sm focus:border-[var(--brand)]"
+                />
+                <label class="block text-sm font-medium mb-2"
+                  >Description</label
+                >
+                <textarea
+                  id="ct-desc"
+                  rows="4"
+                  placeholder="Describe your project..."
+                  class="w-full px-4 py-3 rounded-xl border border-[var(--border)] mb-2 text-sm resize-none focus:border-[var(--brand)]"
+                >
+AI-powered assistant for providing basic healthcare information.</textarea
+                >
+                <p class="text-xs text-[var(--muted2)] mb-6">
+                  This helps AI understand what skills your project will need.
+                </p>
+                <div class="flex justify-end">
+                  <button
+                    onclick="ctGoStep(2)"
+                    class="btn-primary px-6 py-3 rounded-xl text-sm"
+                  >
+                    Next: Requirements →
+                  </button>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div
+                id="ct-step-2"
+                class="glass-strong rounded-2xl p-7 md:p-8 hidden"
+              >
+                <label class="block text-sm font-medium mb-3"
+                  >Required Skills</label
+                >
+                <div id="ct-skills" class="flex flex-wrap gap-2 mb-6">
+                  <span
+                    class="chip selected"
+                    onclick="this.classList.toggle('selected')"
+                    >Python</span
+                  >
+                  <span
+                    class="chip selected"
+                    onclick="this.classList.toggle('selected')"
+                    >Machine Learning</span
+                  >
+                  <span
+                    class="chip selected"
+                    onclick="this.classList.toggle('selected')"
+                    >React</span
+                  >
+                  <span
+                    class="chip selected"
+                    onclick="this.classList.toggle('selected')"
+                    >UI/UX</span
+                  >
+                  <span class="chip" onclick="this.classList.toggle('selected')"
+                    >Node.js</span
+                  >
+                  <span class="chip" onclick="this.classList.toggle('selected')"
+                    >Figma</span
+                  >
+                </div>
+
+                <label class="block text-sm font-medium mb-3"
+                  >Required Roles</label
+                >
+                <div id="ct-roles" class="flex flex-wrap gap-2 mb-6">
+                  <span
+                    class="chip selected"
+                    onclick="this.classList.toggle('selected')"
+                    >ML Engineer</span
+                  >
+                  <span
+                    class="chip selected"
+                    onclick="this.classList.toggle('selected')"
+                    >Frontend Developer</span
+                  >
+                  <span
+                    class="chip selected"
+                    onclick="this.classList.toggle('selected')"
+                    >UI/UX Designer</span
+                  >
+                  <span class="chip" onclick="this.classList.toggle('selected')"
+                    >Backend Developer</span
+                  >
+                  <span class="chip" onclick="this.classList.toggle('selected')"
+                    >Product Manager</span
+                  >
+                </div>
+
+                <label class="block text-sm font-medium mb-3">Team Size</label>
+                <div class="flex items-center gap-4 mb-8">
+                  <button
+                    onclick="ctChangeSize(-1)"
+                    class="w-10 h-10 rounded-xl border border-[var(--border)] flex items-center justify-center hover:bg-white/5"
+                  >
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <path d="M5 12h14" />
+                    </svg>
+                  </button>
+                  <span id="ct-size" class="text-2xl font-bold w-16 text-center"
+                    >4</span
+                  >
+                  <button
+                    onclick="ctChangeSize(1)"
+                    class="w-10 h-10 rounded-xl border border-[var(--border)] flex items-center justify-center hover:bg-white/5"
+                  >
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                  </button>
+                  <span class="text-sm text-[var(--muted)]">members</span>
+                </div>
+
+                <div class="glass rounded-xl p-4 mb-8">
+                  <p
+                    class="text-xs font-semibold text-[var(--muted)] mb-3 uppercase tracking-wide"
+                  >
+                    Current Team
+                  </p>
+                  <div class="flex items-center gap-3 mb-2">
+                    <div
+                      class="avatar w-8 h-8 rounded-full text-xs bg-[var(--brand)] text-black"
+                    >
+                      V
+                    </div>
+                    <p class="text-sm">
+                      Varshil
+                      <span class="text-[var(--muted)]"
+                        >— React, JavaScript</span
+                      >
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="avatar w-8 h-8 rounded-full text-xs"
+                      style="background: rgba(255, 255, 255, 0.1); color: white"
+                    >
+                      J
+                    </div>
+                    <p class="text-sm">
+                      Jay
+                      <span class="text-[var(--muted)]">— Python, Backend</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex justify-between">
+                  <button
+                    onclick="ctGoStep(1)"
+                    class="btn-ghost px-4 py-3 text-sm"
+                  >
+                    ← Back
+                  </button>
+                  <button
+                    onclick="startAnalysis()"
+                    class="btn-primary px-6 py-3 rounded-xl text-sm"
+                  >
+                    ✨ Analyze My Team
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <!-- ===================== AI ANALYSIS ===================== -->
+            <section id="screen-analysis" class="app-screen">
+              <div class="max-w-lg mx-auto text-center pt-10">
+                <div
+                  class="relative w-32 h-32 mx-auto mb-8 flex items-center justify-center"
+                >
+                  <div class="scan-ring absolute inset-0"></div>
+                  <span class="text-4xl relative">🧠</span>
+                </div>
+                <h1 class="font-display font-bold text-2xl mb-2">
+                  Analyzing your team...
+                </h1>
+                <p class="text-[var(--muted)] mb-10 text-sm">
+                  Our AI is scanning your project, current skills, and required
+                  roles.
+                </p>
+
+                <div class="glass-strong rounded-2xl p-6 text-left space-y-5">
+                  <div class="step-row flex items-center gap-3" id="an-step-1">
+                    <div class="step-check" id="an-check-1"></div>
+                    <span class="text-sm">Understanding project</span>
+                  </div>
+                  <div class="step-row flex items-center gap-3" id="an-step-2">
+                    <div class="step-check" id="an-check-2"></div>
+                    <span class="text-sm">Analyzing team skills</span>
+                  </div>
+                  <div class="step-row flex items-center gap-3" id="an-step-3">
+                    <div class="step-check" id="an-check-3"></div>
+                    <span class="text-sm">Identifying required roles</span>
+                  </div>
+                  <div class="step-row flex items-center gap-3" id="an-step-4">
+                    <div class="step-check" id="an-check-4"></div>
+                    <span class="text-sm">Finding skill gaps</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ===================== SKILL GAP ===================== -->
+            <section id="screen-skill-gap" class="app-screen max-w-3xl">
+              <h1 class="font-display font-bold text-3xl mb-1">
+                Team Skill Health
+              </h1>
+              <p class="text-[var(--muted)] mb-8">
+                Based on your project requirements and current team.
+              </p>
+
+              <div class="glass-strong rounded-2xl p-6 mb-6">
+                <p
+                  class="text-xs font-semibold text-[var(--muted)] mb-4 uppercase tracking-wide"
+                >
+                  Current Team
+                </p>
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="avatar w-10 h-10 rounded-full bg-[var(--brand)] text-black"
+                    >
+                      V
+                    </div>
+                    <div>
+                      <p class="font-semibold text-sm">Varshil</p>
+                      <p class="text-xs text-[var(--muted)]">
+                        React · JavaScript
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <div
+                      class="avatar w-10 h-10 rounded-full bg-[rgba(255,255,255,0.1)] text-white"
+                    >
+                      J
+                    </div>
+                    <div>
+                      <p class="font-semibold text-sm">Jay</p>
+                      <p class="text-xs text-[var(--muted)]">
+                        Python · Backend
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="glass-strong rounded-2xl p-6 mb-6">
+                <p
+                  class="text-xs font-semibold text-[var(--muted)] mb-4 uppercase tracking-wide"
+                >
+                  Skill Coverage
+                </p>
+                <div id="skill-gap-list" class="space-y-3"></div>
+              </div>
+
+              <div
+                class="rounded-2xl p-6 mb-8 border border-[rgba(248,113,113,0.35)]"
+                style="
+                  background: linear-gradient(
+                    135deg,
+                    rgba(248, 113, 113, 0.08),
+                    rgba(251, 191, 36, 0.06)
+                  );
+                "
+              >
+                <p class="font-semibold text-lg" id="skill-gap-message">
+                  ⚠️ Your team is missing Machine Learning and UI/UX expertise.
+                </p>
+              </div>
+
+              <div class="flex justify-center">
+                <button
+                  onclick="findTeammates()"
+                  class="btn-primary px-8 py-4 rounded-xl text-base"
+                >
+                  ✨ Find Teammates with AI
+                </button>
+              </div>
+            </section>
+
+            <!-- ===================== RECOMMENDATIONS ===================== -->
+            <section id="screen-recommendations" class="app-screen">
+              <div
+                class="flex items-center justify-between mb-2 flex-wrap gap-3"
+              >
+                <div>
+                  <h1 class="font-display font-bold text-3xl mb-1">
+                    ✨ AI-Recommended Teammates
+                  </h1>
+                  <p class="text-[var(--muted)]">
+                    Ranked by fit for AI Healthcare Assistant
+                  </p>
+                </div>
+              </div>
+              <div id="recs-grid" class="grid md:grid-cols-3 gap-6 mt-8"></div>
+            </section>
+
+            <!-- ===================== STUDENT PROFILE ===================== -->
+            <section id="screen-profile-view" class="app-screen max-w-4xl">
+              <button
+                onclick="showScreen('recommendations')"
+                class="btn-ghost text-sm mb-6 inline-flex items-center gap-1"
+              >
+                ← Back to recommendations
+              </button>
+              <div id="profile-view-content"></div>
+            </section>
+
+            <!-- ===================== MY PROFILE ===================== -->
+            <!-- ===================== MY PROFILE ===================== -->
+            <section id="screen-my-profile" class="app-screen max-w-4xl">
+              <!-- VIEW MODE (Shows by default) -->
+              <div id="profile-view-mode">
+                <h1 class="font-display font-bold text-3xl mb-8">My Profile</h1>
+                <div class="glass-strong rounded-3xl p-8">
+                  <div class="flex flex-col sm:flex-row items-start gap-6 mb-8">
+                    <div
+                      class="avatar profile-avatar w-24 h-24 rounded-2xl text-3xl"
+                    >
+                      V
+                    </div>
+                    <div class="flex-1">
+                      <h2
+                        id="profile-display-name"
+                        class="font-display font-bold text-2xl mb-1"
+                      >
+                        Varshil Patel
+                      </h2>
+                      <p
+                        id="profile-display-academic"
+                        class="text-[var(--muted)] mb-3"
+                      >
+                        NIT Surat · Computer Science · 3rd Year
+                      </p>
+                      <div
+                        id="profile-display-skills"
+                        class="flex flex-wrap gap-2"
+                      >
+                        <span class="chip-static">React</span
+                        ><span class="chip-static">JavaScript</span>
+                      </div>
+                    </div>
+                    <button
+                      onclick="openEditProfile()"
+                      class="btn-secondary px-5 py-2.5 rounded-xl text-sm"
+                    >
+                      Edit Profile
+                    </button>
+                  </div>
+                  <div class="grid sm:grid-cols-3 gap-6 text-sm">
+                    <div>
+                      <p class="text-[var(--muted)] text-xs mb-1">
+                        Preferred Role
+                      </p>
+                      <p id="profile-display-role" class="font-medium">
+                        Frontend Developer
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-[var(--muted)] text-xs mb-1">
+                        Availability
+                      </p>
+                      <p id="profile-display-availability" class="font-medium">
+                        10–15 hrs/week
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-[var(--muted)] text-xs mb-1">Interests</p>
+                      <p id="profile-display-interests" class="font-medium">
+                        Web Dev, AI
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- EDIT MODE (Hidden by default) -->
+              <div id="edit-profile-panel" class="hidden mt-8">
+                <div class="mb-8">
+                  <p
+                    class="text-[var(--brand)] text-xs font-bold tracking-[0.2em] uppercase mb-3"
+                  >
+                    PROFILE SETTINGS
+                  </p>
+                  <h1
+                    class="font-display font-extrabold text-3xl md:text-4xl mb-2"
+                  >
+                    Edit your profile.
+                  </h1>
+                  <p class="text-[var(--muted)] text-sm">
+                    This helps our AI match you with the right teams and
+                    teammates.
+                  </p>
+                </div>
+
+                <div class="glass-strong rounded-3xl p-6 md:p-8">
+                  <!-- 01 BASIC INFORMATION -->
+                  <div class="mb-9">
+                    <p
+                      class="text-[var(--brand)] text-xs font-bold tracking-[0.15em] uppercase mb-5"
+                    >
+                      01 — Basic Information
+                    </p>
+                    <div class="grid sm:grid-cols-2 gap-5">
+                      <div>
+                        <label
+                          class="block text-xs font-medium text-[var(--muted)] mb-2"
+                          >Full Name</label
+                        >
+                        <input
+                          id="profile-name"
+                          type="text"
+                          value="Varshil Patel"
+                          placeholder="Enter your full name"
+                          class="w-full px-4 py-3 rounded-xl border border-[var(--border)] text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          class="block text-xs font-medium text-[var(--muted)] mb-2"
+                          >College</label
+                        >
+                        <input
+                          id="profile-college"
+                          type="text"
+                          value="NIT Surat"
+                          placeholder="Enter your college"
+                          class="w-full px-4 py-3 rounded-xl border border-[var(--border)] text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          class="block text-xs font-medium text-[var(--muted)] mb-2"
+                          >Branch</label
+                        >
+                        <input
+                          id="profile-branch"
+                          type="text"
+                          value="Computer Science"
+                          placeholder="e.g. Computer Science"
+                          class="w-full px-4 py-3 rounded-xl border border-[var(--border)] text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          class="block text-xs font-medium text-[var(--muted)] mb-2"
+                          >Year</label
+                        >
+                        <select
+                          id="profile-year"
+                          class="w-full px-4 py-3 rounded-xl border border-[var(--border)] text-sm"
+                        >
+                          <option>1st Year</option>
+                          <option>2nd Year</option>
+                          <option selected>3rd Year</option>
+                          <option>4th Year</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 02 SKILLS & ROLE -->
+                  <div class="mb-9">
+                    <p
+                      class="text-[var(--brand)] text-xs font-bold tracking-[0.15em] uppercase mb-5"
+                    >
+                      02 — Skills & Role
+                    </p>
+                    <div class="grid sm:grid-cols-2 gap-5">
+                      <div class="sm:col-span-2">
+                        <label
+                          class="block text-xs font-medium text-[var(--muted)] mb-2"
+                          >Skills</label
+                        >
+                        <input
+                          id="profile-skills"
+                          type="text"
+                          value="React, JavaScript"
+                          placeholder="React, Python, Figma, Node.js..."
+                          class="w-full px-4 py-3 rounded-xl border border-[var(--border)] text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          class="block text-xs font-medium text-[var(--muted)] mb-2"
+                          >Skill Level</label
+                        >
+                        <select
+                          id="profile-level"
+                          class="w-full px-4 py-3 rounded-xl border border-[var(--border)] text-sm"
+                        >
+                          <option>Beginner</option>
+                          <option selected>Intermediate</option>
+                          <option>Advanced</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          class="block text-xs font-medium text-[var(--muted)] mb-2"
+                          >Preferred Role</label
+                        >
+                        <select
+                          id="profile-role"
+                          class="w-full px-4 py-3 rounded-xl border border-[var(--border)] text-sm"
+                        >
+                          <option selected>Frontend Developer</option>
+                          <option>Backend Developer</option>
+                          <option>ML Engineer</option>
+                          <option>UI/UX Designer</option>
+                          <option>Product Manager</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 03 INTERESTS & AVAILABILITY -->
+                  <div class="mb-8">
+                    <p
+                      class="text-[var(--brand)] text-xs font-bold tracking-[0.15em] uppercase mb-5"
+                    >
+                      03 — Interests & Availability
+                    </p>
+                    <div class="grid gap-5">
+                      <div>
+                        <label
+                          class="block text-xs font-medium text-[var(--muted)] mb-2"
+                          >Interests</label
+                        >
+                        <input
+                          id="profile-interests"
+                          type="text"
+                          value="Web Dev, AI"
+                          placeholder="AI, Web Development, FinTech..."
+                          class="w-full px-4 py-3 rounded-xl border border-[var(--border)] text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          class="block text-xs font-medium text-[var(--muted)] mb-2"
+                          >Availability</label
+                        >
+                        <select
+                          id="profile-availability"
+                          class="w-full px-4 py-3 rounded-xl border border-[var(--border)] text-sm"
+                        >
+                          <option>&lt; 5 hrs/week</option>
+                          <option selected>10–15 hrs/week</option>
+                          <option>15–25 hrs/week</option>
+                          <option>25+ hrs/week</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ACTIONS -->
+                  <div
+                    class="flex justify-end gap-3 pt-6 border-t border-[var(--border)]"
+                  >
+                    <button
+                      type="button"
+                      onclick="closeEditProfile()"
+                      class="btn-secondary px-5 py-2.5 rounded-xl text-sm"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onclick="saveProfile(event)"
+                      class="btn-primary px-6 py-2.5 rounded-xl text-sm"
+                    >
+                      Save Profile →
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ===================== DISCOVER TEAMS ===================== -->
+            <section id="screen-discover-teams" class="app-screen">
+              <h1 class="font-display font-bold text-3xl mb-1">
+                Find a team worth building with.
+              </h1>
+              <p class="text-[var(--muted)] mb-6">
+                Explore active student projects and hackathon teams.
+              </p>
+
+              <div class="flex items-center gap-3 mb-5">
+                <div class="relative flex-1">
+                  <svg
+                    class="icon absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted)]"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="11" cy="11" r="7" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
+                  <input
+                    id="team-search"
+                    oninput="renderTeams()"
+                    type="text"
+                    placeholder="Search projects or skills..."
+                    class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-[var(--border)] text-sm focus:border-[var(--brand)]"
+                  />
+                </div>
+              </div>
+              <div id="team-filters" class="flex flex-wrap gap-2 mb-8"></div>
+              <div id="teams-grid" class="grid md:grid-cols-2 gap-5"></div>
+            </section>
+
+            <!-- ===================== TEAM DETAILS ===================== -->
+            <section id="screen-team-details" class="app-screen max-w-4xl">
+              <button
+                onclick="showScreen('discover-teams')"
+                class="btn-ghost text-sm mb-6 inline-flex items-center gap-1"
+              >
+                ← Back to teams
+              </button>
+              <div id="team-details-content"></div>
+            </section>
+
+            <!-- ===================== MY TEAMS ===================== -->
+            <section id="screen-my-teams" class="app-screen">
+              <h1 class="font-display font-bold text-3xl mb-1">My Teams</h1>
+              <p class="text-[var(--muted)] mb-8">
+                Projects you're currently part of.
+              </p>
+              <div id="my-teams-grid" class="grid md:grid-cols-2 gap-5"></div>
+            </section>
+
+            <!-- ===================== INVITATIONS ===================== -->
+            <section id="screen-invitations" class="app-screen max-w-3xl">
+              <h1 class="font-display font-bold text-3xl mb-1">Invitations</h1>
+              <p class="text-[var(--muted)] mb-8">
+                Manage incoming join requests and outgoing invites.
+              </p>
+
+              <h2 class="font-display font-bold text-lg mb-4">
+                Incoming Requests
+              </h2>
+              <div id="incoming-invites" class="space-y-4 mb-10"></div>
+
+              <h2 class="font-display font-bold text-lg mb-4">
+                Outgoing Invitations
+              </h2>
+              <div id="outgoing-invites" class="space-y-3"></div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODALS -->
+    <!-- ============================================================ -->
+    <div
+      id="modal-match"
+      class="modal-overlay"
+      onclick="if (event.target === this) closeModal('modal-match');"
+    >
+      <div
+        class="modal-box glass-strong rounded-3xl p-7 md:p-8 w-full max-w-md"
+      >
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <p
+              class="text-xs text-[var(--muted)] uppercase tracking-wide font-semibold mb-1"
+            >
+              Match Breakdown
+            </p>
+            <h3 id="mm-title" class="font-display font-bold text-2xl">
+              94% Match
+            </h3>
+          </div>
+          <button
+            onclick="closeModal('modal-match')"
+            class="text-[var(--muted)] hover:text-white"
+          >
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+        <div id="mm-bars" class="space-y-4"></div>
+      </div>
+    </div>
+
+    <div
+      id="modal-why"
+      class="modal-overlay"
+      onclick="if (event.target === this) closeModal('modal-why');"
+    >
+      <div
+        class="modal-box rounded-3xl p-7 md:p-8 w-full max-w-lg"
+        style="
+          background: rgba(181, 255, 0, 0.05);
+          border: 1px solid rgba(181, 255, 0, 0.3);
+          backdrop-filter: blur(20px);
+        "
+      >
+        <div class="flex items-start justify-between mb-5">
+          <h3 id="why-title" class="font-display font-bold text-2xl">
+            🤖 Why Ananya?
+          </h3>
+          <button
+            onclick="closeModal('modal-why')"
+            class="text-[var(--muted)] hover:text-white"
+          >
+            <svg class="icon" viewBox="0 0 24 24">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+        <p
+          id="why-text"
+          class="text-[var(--text)] leading-relaxed text-[15px]"
+        ></p>
+        <div class="mt-6 flex items-center gap-2 text-xs text-[var(--muted)]">
+          <span
+            class="w-2 h-2 rounded-full bg-[var(--brand)] animate-pulse"
+          ></span>
+          Generated by TeamForge AI · Based on skills, interests & team gaps
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/index.js"></script>
+    <script src="js/matching.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
