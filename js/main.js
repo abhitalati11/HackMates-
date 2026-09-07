@@ -2109,14 +2109,14 @@ async function renderMyTeams() {
 <div class="grid grid-cols-2 gap-2">
 
   <button
-    onclick="viewTeam(${t.id})"
+    onclick="viewTeam('${t.id}')"
     class="btn-secondary w-full py-2.5 rounded-xl text-sm"
   >
     Open Team
   </button>
 
   <button
-    onclick="openTeamChat(${t.id})"
+    onclick="openTeamChat('${t.id}')"
     class="btn-primary w-full py-2.5 rounded-xl text-sm"
   >
     💬 Team Chat
