@@ -269,19 +269,32 @@ function showPage(id) {
   document.getElementById("page-" + id).classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
+let currentScreen = "dashboard";
+let previousScreen = "dashboard";
+
 function showScreen(id) {
+  if (id !== "profile-view") {
+    previousScreen = currentScreen || id;
+  }
+  currentScreen = id;
   showPage("app");
   document
     .querySelectorAll(".app-screen")
     .forEach((s) => s.classList.remove("active"));
-  document.getElementById("screen-" + id).classList.add("active");
+  const targetScreen = document.getElementById("screen-" + id);
+  if (targetScreen) targetScreen.classList.add("active");
   document
     .querySelectorAll(".nav-item")
     .forEach((n) => n.classList.remove("active"));
   const nav = document.querySelector(`.nav-item[data-nav="${id}"]`);
   if (nav) nav.classList.add("active");
   toggleSidebar(false);
-  document.querySelector("main").scrollTo({ top: 0, behavior: "smooth" });
+  const main = document.querySelector("main");
+  if (main) main.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function goBackFromProfile() {
+  showScreen(previousScreen || "dashboard");
 }
 function toggleSidebar(open) {
   const sb = document.getElementById("sidebar");
@@ -1085,7 +1098,23 @@ async function getRecommendedTeammates(limit = 6) {
     .select("*")
     .neq("id", user.id);
 
-  if (error || !profiles) return [];
+  if (error || !profiles || profiles.length === 0) {
+    return students.slice(0, limit).map((s) => ({
+      id: s.id,
+      name: s.name,
+      role: s.role,
+      branch: s.branch,
+      year: s.year,
+      matchScore: s.match,
+      skills: s.skills,
+      matchedSkills: s.skills.slice(0, 2),
+      filledGaps: s.skills.slice(0, 2),
+      availability: s.availability,
+      skill_level: "Intermediate",
+      about: s.about,
+      college: s.college
+    }));
+  }
 
   // Calculate match scores for each candidate
   const scoredCandidates = profiles.map((candidate) => {
@@ -1193,7 +1222,7 @@ function recCardHTML(s, i) {
           <p class="text-xs text-[var(--muted)]">${s.role}</p>
         </div>
       </div>
-      <button onclick="openMatchModal(${s.id})" class="text-center group">
+      <button onclick="openMatchModal('${s.id}')" class="text-center group">
         <svg class="score-ring" width="48" height="48" viewBox="0 0 48 48">
           <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.08)" stroke-width="5" fill="none"/>
           <circle id="ring-${s.id}" cx="24" cy="24" r="20" stroke="url(#grad)" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="125.6" stroke-dashoffset="125.6"/>
@@ -1202,13 +1231,13 @@ function recCardHTML(s, i) {
       </button>
     </div>
     <div class="flex flex-wrap gap-1.5 mb-3">
-      ${s.skills.map((sk) => `<span class="chip-static">${sk}</span>`).join("")}
+      ${(s.skills || []).map((sk) => `<span class="chip-static">${sk}</span>`).join("")}
     </div>
-    <p class="text-sm text-[var(--muted)] mb-5 leading-relaxed flex-1">${s.summary}</p>
-    <button onclick="openWhyModal(${s.id})" class="text-xs font-medium text-[var(--brand)] hover:underline mb-4 text-left">🤖 Why ${s.name.split(" ")[0]}?</button>
+    <p class="text-sm text-[var(--muted)] mb-5 leading-relaxed flex-1">${s.summary || s.about || "Matching candidate for your team."}</p>
+    <button onclick="openWhyModal('${s.id}')" class="text-xs font-medium text-[var(--brand)] hover:underline mb-4 text-left">🤖 Why ${(s.name || "Student").split(" ")[0]}?</button>
     <div class="flex gap-2">
-      <button onclick="viewProfile(${s.id})" class="btn-secondary flex-1 py-2.5 rounded-xl text-sm">View Profile</button>
-      <button data-invite-btn="${s.id}" onclick="inviteStudent(${s.id})" class="btn-primary flex-1 py-2.5 rounded-xl text-sm">Invite</button>
+      <button onclick="viewProfile('${s.id}')" class="btn-secondary flex-1 py-2.5 rounded-xl text-sm cursor-pointer">View Profile</button>
+      <button data-invite-btn="${s.id}" onclick="inviteStudent('${s.id}')" class="btn-primary flex-1 py-2.5 rounded-xl text-sm cursor-pointer">Invite</button>
     </div>
   </div>`;
 }
@@ -1417,26 +1446,33 @@ Explain:
 }
 
 function inviteStudent(id) {
+  const idStr = String(id);
+  state.invited.add(idStr);
   state.invited.add(id);
-  const s = students.find((x) => x.id === id);
-  if (!outgoingInvites.find((o) => o.name === s.name)) {
+
+  let s = students.find((x) => String(x.id) === idStr);
+  const studentName = s ? s.name : "Teammate";
+  const studentRole = s ? s.role : "Developer";
+
+  if (!outgoingInvites.find((o) => o.name === studentName)) {
     outgoingInvites.unshift({
-      name: s.name,
+      name: studentName,
       project: "AI Healthcare Assistant",
-      role: s.role,
+      role: studentRole,
     });
   }
   updateInviteButtons();
   renderInvitations();
   showToast(
-    `Invitation sent to ${s.name}! They'll be notified instantly.`,
+    `Invitation sent to ${studentName}! They'll be notified instantly.`,
     "success",
   );
 }
+
 function updateInviteButtons() {
   document.querySelectorAll("[data-invite-btn]").forEach((btn) => {
-    const id = parseInt(btn.dataset.inviteBtn);
-    if (state.invited.has(id)) {
+    const btnId = String(btn.dataset.inviteBtn);
+    if (state.invited.has(btnId) || state.invited.has(Number(btnId))) {
       btn.textContent = "Invitation Sent ✓";
       btn.disabled = true;
       btn.classList.add("opacity-70", "cursor-not-allowed");
@@ -1449,26 +1485,114 @@ function updateInviteButtons() {
 }
 
 /* ============================= STUDENT PROFILE ============================= */
-function viewProfile(id) {
-  const s = students.find((x) => x.id === id);
+async function viewProfile(id) {
+  const idStr = String(id);
+  let s = students.find((x) => String(x.id) === idStr);
+
+  if (!s && typeof supabaseClient !== "undefined") {
+    try {
+      const { data: p } = await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (p) {
+        const skillsArr = Array.isArray(p.skills)
+          ? p.skills
+          : typeof p.skills === "string"
+          ? p.skills.split(",").map((x) => x.trim()).filter(Boolean)
+          : ["Development"];
+
+        const projectsArr = Array.isArray(p.projects)
+          ? p.projects
+          : typeof p.projects === "string"
+          ? p.projects.split(",").map((x) => x.trim()).filter(Boolean)
+          : ["Portfolio Project"];
+
+        const hackathonsArr = Array.isArray(p.hackathons)
+          ? p.hackathons
+          : typeof p.hackathons === "string"
+          ? p.hackathons.split(",").map((x) => x.trim()).filter(Boolean)
+          : ["Hackathon Participant"];
+
+        const interestsArr = Array.isArray(p.interests)
+          ? p.interests
+          : typeof p.interests === "string"
+          ? p.interests.split(",").map((x) => x.trim()).filter(Boolean)
+          : ["Tech", "Innovation"];
+
+        const skillLevelsObj = p.skill_levels || p.skillLevels || Object.fromEntries(skillsArr.map((sk) => [sk, 85]));
+
+        s = {
+          id: p.id,
+          name: p.name || "Student Developer",
+          role: p.role || "Team Member",
+          match: p.matchScore || p.match || 88,
+          college: p.college || "University",
+          branch: p.branch || "Computer Science",
+          year: p.year || "3rd Year",
+          about: p.about || p.bio || "Passionate software developer interested in building innovative projects and collaborating with high-performing teams.",
+          skills: skillsArr,
+          skillLevels: skillLevelsObj,
+          projects: projectsArr,
+          hackathons: hackathonsArr,
+          interests: interestsArr,
+          availability: p.availability || "10–15 hrs/week",
+          github: p.github || "github.com",
+          linkedin: p.linkedin || "linkedin.com",
+          why: `${p.name || "This developer"} brings great experience in ${skillsArr.slice(0, 3).join(", ")}, strong collaboration skills, and excellent project availability.`,
+        };
+      }
+    } catch (err) {
+      console.error("Error fetching profile from DB:", err);
+    }
+  }
+
+  // Fallback profile if not found
+  if (!s) {
+    s = {
+      id: id,
+      name: "Student Developer",
+      role: "Team Member",
+      match: 85,
+      college: "Engineering College",
+      branch: "Computer Science",
+      year: "3rd Year",
+      about: "Passionate developer eager to collaborate on hackathons and team projects.",
+      skills: ["Full Stack", "JavaScript", "Python"],
+      skillLevels: { "JavaScript": 88, "Python": 82, "Web Dev": 85 },
+      projects: ["Web App"],
+      hackathons: ["Tech Hackathon 2024"],
+      interests: ["AI", "Web Development"],
+      availability: "10-15 hrs/week",
+      github: "github.com",
+      linkedin: "linkedin.com",
+      why: "Strong technical skills and good availability for team projects."
+    };
+  }
+
+  const matchVal = s.match || s.matchScore || 85;
   const content = document.getElementById("profile-view-content");
+  if (!content) return;
+
   content.innerHTML = `
   <div class="glass-strong rounded-3xl p-8 mb-6">
     <div class="flex flex-col sm:flex-row items-start gap-6 mb-6">
-      <div class="avatar w-24 h-24 rounded-2xl text-3xl">${s.name[0]}</div>
+      <div class="avatar w-24 h-24 rounded-2xl text-3xl font-bold bg-[var(--brand)] text-black flex items-center justify-center">${(s.name || "S")[0].toUpperCase()}</div>
       <div class="flex-1">
         <div class="flex items-center gap-3 flex-wrap mb-1">
           <h2 class="font-display font-bold text-2xl">${s.name}</h2>
-          <span class="chip-static" style="background:rgba(181,255,0,0.1); border-color:rgba(181,255,0,0.4); color:var(--brand);">${s.match}% Match</span>
+          <span class="chip-static" style="background:rgba(181,255,0,0.1); border-color:rgba(181,255,0,0.4); color:var(--brand);">${matchVal}% Match</span>
         </div>
         <p class="text-[var(--muted)] mb-1">${s.role}</p>
-        <p class="text-[var(--muted)] text-sm">${s.college} · ${s.branch} · ${s.year}</p>
+        <p class="text-[var(--muted)] text-sm">${s.college || "University"} · ${s.branch || "CS"} · ${s.year || "3rd Year"}</p>
       </div>
-      <button data-invite-btn="${s.id}" onclick="inviteStudent(${s.id})" class="btn-primary px-6 py-3 rounded-xl text-sm whitespace-nowrap">Invite to Team</button>
+      <button data-invite-btn="${s.id}" onclick="inviteStudent('${s.id}')" class="btn-primary px-6 py-3 rounded-xl text-sm whitespace-nowrap">Invite to Team</button>
     </div>
     <p class="text-sm text-[var(--text)] leading-relaxed mb-6">${s.about}</p>
     <div class="flex flex-wrap gap-2 mb-2">
-      ${s.skills.map((sk) => `<span class="chip-static">${sk}</span>`).join("")}
+      ${(s.skills || []).map((sk) => `<span class="chip-static">${sk}</span>`).join("")}
     </div>
   </div>
 
@@ -1476,7 +1600,7 @@ function viewProfile(id) {
     <div class="glass-strong rounded-2xl p-6">
       <h3 class="font-display font-bold mb-4">Skill Levels</h3>
       <div class="space-y-4">
-        ${Object.entries(s.skillLevels)
+        ${Object.entries(s.skillLevels || {})
           .map(
             ([k, v]) => `
           <div>
@@ -1490,24 +1614,25 @@ function viewProfile(id) {
     <div class="glass-strong rounded-2xl p-6">
       <h3 class="font-display font-bold mb-4">Projects & Hackathons</h3>
       <p class="text-xs text-[var(--muted)] uppercase tracking-wide mb-2 font-semibold">Projects</p>
-      <ul class="text-sm space-y-1.5 mb-4">${s.projects.map((p) => `<li class="flex gap-2"><span class="text-[var(--brand)]">•</span>${p}</li>`).join("")}</ul>
+      <ul class="text-sm space-y-1.5 mb-4">${(s.projects || []).map((p) => `<li class="flex gap-2"><span class="text-[var(--brand)]">•</span>${p}</li>`).join("")}</ul>
       <p class="text-xs text-[var(--muted)] uppercase tracking-wide mb-2 font-semibold">Hackathons</p>
-      <ul class="text-sm space-y-1.5">${s.hackathons.map((p) => `<li class="flex gap-2"><span class="text-[var(--brand)]">🏆</span>${p}</li>`).join("")}</ul>
+      <ul class="text-sm space-y-1.5">${(s.hackathons || []).map((p) => `<li class="flex gap-2"><span class="text-[var(--brand)]">🏆</span>${p}</li>`).join("")}</ul>
     </div>
   </div>
 
   <div class="rounded-2xl p-6 mb-6" style="background:rgba(181,255,0,0.05); border:1px solid rgba(181,255,0,0.2);">
-    <h3 class="font-display font-bold mb-3">🤖 Why ${s.name.split(" ")[0]}?</h3>
-    <p class="text-sm leading-relaxed">${s.why}</p>
+    <h3 class="font-display font-bold mb-3">🤖 Why ${(s.name || "Student").split(" ")[0]}?</h3>
+    <p class="text-sm leading-relaxed">${s.why || "Great skill fit and availability for project collaboration."}</p>
   </div>
 
   <div class="glass-strong rounded-2xl p-6 flex flex-wrap gap-x-10 gap-y-4 text-sm">
-    <div><p class="text-[var(--muted)] text-xs mb-1">Available</p><p class="font-medium">${s.availability}</p></div>
-    <div><p class="text-[var(--muted)] text-xs mb-1">Interested in</p><p class="font-medium">${s.interests.join(" • ")}</p></div>
-    <div><p class="text-[var(--muted)] text-xs mb-1">GitHub</p><p class="font-medium text-[var(--brand)]">${s.github}</p></div>
-    <div><p class="text-[var(--muted)] text-xs mb-1">LinkedIn</p><p class="font-medium text-[var(--brand)]">${s.linkedin}</p></div>
+    <div><p class="text-[var(--muted)] text-xs mb-1">Available</p><p class="font-medium">${s.availability || "10-15 hrs/week"}</p></div>
+    <div><p class="text-[var(--muted)] text-xs mb-1">Interested in</p><p class="font-medium">${Array.isArray(s.interests) ? s.interests.join(" • ") : (s.interests || "Tech")}</p></div>
+    <div><p class="text-[var(--muted)] text-xs mb-1">GitHub</p><p class="font-medium text-[var(--brand)]">${s.github && s.github !== "N/A" ? `<a href="${s.github.startsWith('http') ? s.github : 'https://' + s.github}" target="_blank" rel="noopener noreferrer" class="hover:underline">${s.github}</a>` : '<span class="text-[var(--muted)]">N/A</span>'}</p></div>
+    <div><p class="text-[var(--muted)] text-xs mb-1">LinkedIn</p><p class="font-medium text-[var(--brand)]">${s.linkedin && s.linkedin !== "N/A" ? `<a href="${s.linkedin.startsWith('http') ? s.linkedin : 'https://' + s.linkedin}" target="_blank" rel="noopener noreferrer" class="hover:underline">${s.linkedin}</a>` : '<span class="text-[var(--muted)]">N/A</span>'}</p></div>
   </div>
   `;
+
   showScreen("profile-view");
   updateInviteButtons();
 }
@@ -2527,6 +2652,10 @@ async function saveProfile(event) {
 
   const interests = document.getElementById("profile-interests").value.trim();
 
+  const github = document.getElementById("profile-github")?.value.trim() || "";
+
+  const linkedin = document.getElementById("profile-linkedin")?.value.trim() || "";
+
   const skillLevel =
     document.querySelector('input[name="skillLevel"]:checked')?.value ||
     "Intermediate";
@@ -2571,6 +2700,8 @@ async function saveProfile(event) {
     skills,
     role,
     interests,
+    github,
+    linkedin,
     skill_level: skillLevel,
     availability,
   };
@@ -2605,6 +2736,20 @@ async function saveProfile(event) {
 
   document.getElementById("profile-display-interests").textContent =
     interests || "Not specified";
+
+  const ghDisplay = document.getElementById("profile-display-github");
+  if (ghDisplay) {
+    ghDisplay.innerHTML = github
+      ? `<a href="${github.startsWith('http') ? github : 'https://' + github}" target="_blank" rel="noopener noreferrer" class="hover:underline">${github}</a>`
+      : "Not added";
+  }
+
+  const liDisplay = document.getElementById("profile-display-linkedin");
+  if (liDisplay) {
+    liDisplay.innerHTML = linkedin
+      ? `<a href="${linkedin.startsWith('http') ? linkedin : 'https://' + linkedin}" target="_blank" rel="noopener noreferrer" class="hover:underline">${linkedin}</a>`
+      : "Not added";
+  }
 
   /* ================================
      UPDATE SKILL CHIPS
@@ -2699,6 +2844,8 @@ async function loadProfileFromSupabase() {
       skills,
       role,
       interests,
+      github,
+      linkedin,
       skill_level,
       availability
     `,
@@ -2727,6 +2874,8 @@ async function loadProfileFromSupabase() {
   const skillsInput = document.getElementById("profile-skills");
   const roleInput = document.getElementById("profile-role");
   const interestsInput = document.getElementById("profile-interests");
+  const githubInput = document.getElementById("profile-github");
+  const linkedinInput = document.getElementById("profile-linkedin");
 
   if (nameInput) nameInput.value = profile.name || "";
   if (collegeInput) collegeInput.value = profile.college || "";
@@ -2741,6 +2890,14 @@ async function loadProfileFromSupabase() {
 
   if (interestsInput) {
     interestsInput.value = profile.interests || "";
+  }
+
+  if (githubInput) {
+    githubInput.value = profile.github || "";
+  }
+
+  if (linkedinInput) {
+    linkedinInput.value = profile.linkedin || "";
   }
 
   // Skill level
@@ -2777,6 +2934,8 @@ async function loadProfileFromSupabase() {
   );
   const displayInterests = document.getElementById("profile-display-interests");
   const displaySkills = document.getElementById("profile-display-skills");
+  const displayGithub = document.getElementById("profile-display-github");
+  const displayLinkedin = document.getElementById("profile-display-linkedin");
 
   if (displayName) {
     displayName.textContent = profile.name || "User";
@@ -2796,6 +2955,18 @@ async function loadProfileFromSupabase() {
 
   if (displayInterests) {
     displayInterests.textContent = profile.interests || "Not specified";
+  }
+
+  if (displayGithub) {
+    displayGithub.innerHTML = profile.github
+      ? `<a href="${profile.github.startsWith('http') ? profile.github : 'https://' + profile.github}" target="_blank" rel="noopener noreferrer" class="hover:underline">${profile.github}</a>`
+      : "Not added";
+  }
+
+  if (displayLinkedin) {
+    displayLinkedin.innerHTML = profile.linkedin
+      ? `<a href="${profile.linkedin.startsWith('http') ? profile.linkedin : 'https://' + profile.linkedin}" target="_blank" rel="noopener noreferrer" class="hover:underline">${profile.linkedin}</a>`
+      : "Not added";
   }
 
   if (displaySkills) {

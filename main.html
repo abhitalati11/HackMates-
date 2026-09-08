@@ -676,10 +676,10 @@ AI-powered assistant for providing basic healthcare information.</textarea
             <!-- ===================== STUDENT PROFILE ===================== -->
             <section id="screen-profile-view" class="app-screen max-w-4xl">
               <button
-                onclick="showScreen('recommendations')"
-                class="btn-ghost text-sm mb-6 inline-flex items-center gap-1"
+                onclick="goBackFromProfile()"
+                class="btn-ghost text-sm mb-6 inline-flex items-center gap-1 cursor-pointer"
               >
-                ← Back to recommendations
+                ← Back
               </button>
               <div id="profile-view-content"></div>
             </section>
@@ -725,7 +725,7 @@ AI-powered assistant for providing basic healthcare information.</textarea
                       Edit Profile
                     </button>
                   </div>
-                  <div class="grid sm:grid-cols-3 gap-6 text-sm">
+                  <div class="grid sm:grid-cols-2 md:grid-cols-5 gap-6 text-sm">
                     <div>
                       <p class="text-[var(--muted)] text-xs mb-1">
                         Preferred Role
@@ -746,6 +746,24 @@ AI-powered assistant for providing basic healthcare information.</textarea
                       <p class="text-[var(--muted)] text-xs mb-1">Interests</p>
                       <p id="profile-display-interests" class="font-medium">
                         Web Dev, AI
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-[var(--muted)] text-xs mb-1">GitHub</p>
+                      <p
+                        id="profile-display-github"
+                        class="font-medium text-[var(--brand)]"
+                      >
+                        Not added
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-[var(--muted)] text-xs mb-1">LinkedIn</p>
+                      <p
+                        id="profile-display-linkedin"
+                        class="font-medium text-[var(--brand)]"
+                      >
+                        Not added
                       </p>
                     </div>
                   </div>
@@ -926,6 +944,41 @@ AI-powered assistant for providing basic healthcare information.</textarea
                           <option>15–25 hrs/week</option>
                           <option>25+ hrs/week</option>
                         </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 04 LINKS & PORTFOLIO -->
+                  <div class="mb-8">
+                    <p
+                      class="text-[var(--brand)] text-xs font-bold tracking-[0.15em] uppercase mb-5"
+                    >
+                      04 — Links & Portfolio
+                    </p>
+                    <div class="grid sm:grid-cols-2 gap-5">
+                      <div>
+                        <label
+                          class="block text-xs font-medium text-[var(--muted)] mb-2"
+                          >GitHub Profile</label
+                        >
+                        <input
+                          id="profile-github"
+                          type="text"
+                          placeholder="github.com/username or https://github.com/username"
+                          class="w-full px-4 py-3 rounded-xl border border-[var(--border)] text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          class="block text-xs font-medium text-[var(--muted)] mb-2"
+                          >LinkedIn Profile</label
+                        >
+                        <input
+                          id="profile-linkedin"
+                          type="text"
+                          placeholder="linkedin.com/in/username or https://linkedin.com/in/username"
+                          class="w-full px-4 py-3 rounded-xl border border-[var(--border)] text-sm"
+                        />
                       </div>
                     </div>
                   </div>
