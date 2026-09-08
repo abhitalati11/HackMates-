@@ -290,18 +290,60 @@
                   id="chat-form"
                   class="p-4 border-t border-[var(--border)]"
                 >
+                  <!-- Selected File Preview Badge (Hidden by default) -->
+                  <div
+                    id="file-preview-container"
+                    class="hidden mb-3 p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs text-white"
+                  >
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                      <span class="text-base shrink-0">📎</span>
+                      <span
+                        id="file-preview-name"
+                        class="truncate font-mono text-sm text-[var(--brand)] font-semibold"
+                        >filename.txt</span
+                      >
+                      <span
+                        id="file-preview-size"
+                        class="text-[var(--muted)] text-[11px] shrink-0"
+                      ></span>
+                    </div>
+                    <button
+                      type="button"
+                      id="remove-file-btn"
+                      class="text-red-400 hover:text-red-300 font-bold px-2 py-1 rounded hover:bg-white/10 transition shrink-0"
+                      title="Remove attachment"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
                   <div class="flex items-center gap-3">
+                    <!-- File Input -->
+                    <input
+                      type="file"
+                      id="chat-file-input"
+                      class="hidden"
+                    />
+                    <button
+                      type="button"
+                      id="attach-file-btn"
+                      title="Attach file (text, code, image, pdf, etc.)"
+                      class="w-11 h-11 rounded-xl border border-[var(--border)] flex items-center justify-center text-lg text-[var(--muted)] hover:text-white hover:border-[var(--brand)] transition bg-white/5 shrink-0"
+                    >
+                      📎
+                    </button>
+
                     <input
                       id="chat-input"
                       type="text"
-                      placeholder="Type a message..."
+                      placeholder="Type a message or attach a file..."
                       autocomplete="off"
                       class="flex-1 px-4 py-3 rounded-xl border border-[var(--border)] text-sm focus:border-[var(--brand)]"
                     />
 
                     <button
                       type="submit"
-                      class="btn-primary w-11 h-11 rounded-xl flex items-center justify-center"
+                      class="btn-primary w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
                     >
                       ➤
                     </button>

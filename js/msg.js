@@ -19,6 +19,7 @@ let currentProfile = null;
 let conversations = [];
 let activeConversationId = null;
 let realtimeSubscription = null;
+let selectedFile = null;
 
 /* =========================================================
    URL PARAMETERS HELPERS
@@ -33,7 +34,7 @@ function getChatParameters() {
 }
 
 /* =========================================================
-   TIME FORMATTER (WITH MILLISECONDS)
+   TIME & FILE FORMATTERS
    ========================================================= */
 
 function formatTimeWithMs(dateInput) {
@@ -45,8 +46,6 @@ function formatTimeWithMs(dateInput) {
   });
   const ms = d.getMilliseconds().toString().padStart(3, '0');
   
-  // Format as "3:45:12.123 PM"
-  // toLocaleTimeString might return "3:45:12 PM", we need to insert the ms before the AM/PM
   const parts = timeStr.split(' ');
   if (parts.length === 2) {
     return `${parts[0]}.${ms} ${parts[1]}`;
@@ -54,6 +53,37 @@ function formatTimeWithMs(dateInput) {
   return `${timeStr}.${ms}`;
 }
 
+function formatBytes(bytes) {
+  if (!bytes || isNaN(bytes)) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+}
+
+function openImagePreview(dataUrl) {
+  if (!dataUrl) return;
+  try {
+    const parts = dataUrl.split(",");
+    if (parts.length < 2) {
+      window.open(dataUrl, "_blank");
+      return;
+    }
+    const mimeMatch = parts[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : "image/png";
+    const bstr = atob(parts[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    const blob = new Blob([u8arr], { type: mime });
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl, "_blank");
+  } catch (e) {
+    console.error("Error opening image preview:", e);
+  }
+}
 
 /* =========================================================
    INITIALIZATION & DATA FETCHING
@@ -98,19 +128,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (sidebarRole) sidebarRole.textContent = currentProfile.role || "Member";
   if (sidebarAvatar) sidebarAvatar.textContent = (currentProfile.name || "U")[0].toUpperCase();
 
-  // 3. Load Joined Teams & Build Conversations
+  // 3. Setup File Attachment Listeners
+  setupFileInputListeners();
+
+  // 4. Load Joined Teams & Build Conversations
   await loadUserTeamsAndConversations();
 
-  // 4. Setup Real-time Listener for Messages
+  // 5. Setup Real-time Listener for Messages
   setupRealtimeMessages();
 
-  // 5. Connect Chat Form Submit Event
+  // 6. Connect Chat Form Submit Event
   const form = document.getElementById("chat-form");
   if (form) {
     form.addEventListener("submit", sendMessage);
   }
 
-  // 6. Open requested conversation from URL parameters if present
+  // 7. Open requested conversation from URL parameters if present
   const params = getChatParameters();
   if (params.type && params.teamId) {
     const conversation = conversations.find(
@@ -123,6 +156,68 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 });
+
+/* =========================================================
+   FILE ATTACHMENT HANDLERS
+   ========================================================= */
+
+function setupFileInputListeners() {
+  const attachBtn = document.getElementById("attach-file-btn");
+  const fileInput = document.getElementById("chat-file-input");
+  const removeBtn = document.getElementById("remove-file-btn");
+
+  if (attachBtn && fileInput) {
+    attachBtn.addEventListener("click", () => fileInput.click());
+  }
+
+  if (fileInput) {
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Reject video files
+      if (file.type.startsWith("video/")) {
+        showToast("Video files are not supported. Please select code, text, image, or document files.", "info");
+        fileInput.value = "";
+        return;
+      }
+
+      // Max file size limit: 10MB
+      const MAX_SIZE = 10 * 1024 * 1024;
+      if (file.size > MAX_SIZE) {
+        showToast("File exceeds maximum 10MB limit.", "info");
+        fileInput.value = "";
+        return;
+      }
+
+      selectedFile = file;
+
+      // Show File Preview Badge
+      const previewContainer = document.getElementById("file-preview-container");
+      const previewName = document.getElementById("file-preview-name");
+      const previewSize = document.getElementById("file-preview-size");
+
+      if (previewContainer && previewName && previewSize) {
+        previewName.textContent = file.name;
+        previewSize.textContent = `(${formatBytes(file.size)})`;
+        previewContainer.classList.remove("hidden");
+      }
+    });
+  }
+
+  if (removeBtn) {
+    removeBtn.addEventListener("click", clearSelectedFile);
+  }
+}
+
+function clearSelectedFile() {
+  selectedFile = null;
+  const fileInput = document.getElementById("chat-file-input");
+  const previewContainer = document.getElementById("file-preview-container");
+
+  if (fileInput) fileInput.value = "";
+  if (previewContainer) previewContainer.classList.add("hidden");
+}
 
 /* =========================================================
    LOAD JOINED TEAMS AND CONSTRUCT CONVERSATIONS
@@ -380,10 +475,24 @@ function renderConversations() {
 
   container.innerHTML = conversations
     .map((chat) => {
-      const lastMessage =
-        chat.messages.length > 0
-          ? chat.messages[chat.messages.length - 1].text
-          : "Click to start chatting";
+      let lastMessage = "Click to start chatting";
+      if (chat.messages.length > 0) {
+        const rawLast = chat.messages[chat.messages.length - 1].text;
+        try {
+          const parsed = JSON.parse(rawLast);
+          if (parsed && typeof parsed === "object" && parsed.attachment) {
+            lastMessage = parsed.text
+              ? `📎 ${parsed.attachment.name}: ${parsed.text}`
+              : `📎 Attached file: ${parsed.attachment.name}`;
+          } else if (parsed && typeof parsed === "object" && parsed.text) {
+            lastMessage = parsed.text;
+          } else {
+            lastMessage = rawLast;
+          }
+        } catch (e) {
+          lastMessage = rawLast;
+        }
+      }
 
       const isActive = chat.id === activeConversationId;
 
@@ -548,7 +657,6 @@ async function fetchMessagesForConversation(chat) {
 
     if (error) {
       console.error("Error fetching messages:", error);
-      // Fall back gracefully if table doesn't exist yet
       if (chat.messages.length === 0) chat.messages = [];
     } else if (msgRows) {
       chat.messages = msgRows.map((msg) => ({
@@ -557,7 +665,7 @@ async function fetchMessagesForConversation(chat) {
         senderId: msg.sender_id,
         mine: msg.sender_id === currentUser.id,
         text: msg.content,
-        time: formatTimeWithMs(msg.created_at) // Milliseconds included here
+        time: formatTimeWithMs(msg.created_at)
       }));
     }
   } catch (err) {
@@ -587,8 +695,99 @@ function renderChatMessages() {
   }
 
   container.innerHTML = chat.messages
-    .map(
-      (message) => `
+    .map((message) => {
+      let messageText = "";
+      let attachment = null;
+
+      if (message.text) {
+        try {
+          const parsed = JSON.parse(message.text);
+          if (parsed && typeof parsed === "object" && parsed.attachment) {
+            messageText = parsed.text || "";
+            attachment = parsed.attachment;
+          } else {
+            messageText = message.text;
+          }
+        } catch (e) {
+          messageText = message.text;
+        }
+      }
+
+      let attachmentHTML = "";
+      if (attachment) {
+        const isImage = attachment.type && attachment.type.startsWith("image/");
+        const isCode =
+          /\.(html|js|jsx|ts|tsx|css|json|py|txt|c|cpp|java|php|rb|md|sql)$/i.test(
+            attachment.name || ""
+          ) ||
+          (attachment.type &&
+            (attachment.type.includes("text") ||
+              attachment.type.includes("javascript") ||
+              attachment.type.includes("json")));
+
+        if (isImage) {
+          attachmentHTML = `
+            <div class="mt-2">
+              <img
+                src="${attachment.data}"
+                alt="${escapeHTML(attachment.name)}"
+                class="max-w-[260px] max-h-[220px] rounded-xl border border-white/15 object-cover cursor-pointer hover:opacity-90 transition shadow-md"
+                onclick="openImagePreview(this.src)"
+              />
+              <div class="mt-1.5 flex items-center justify-between gap-2">
+                <span class="text-[11px] font-mono text-gray-300 truncate">${escapeHTML(attachment.name)} (${formatBytes(attachment.size)})</span>
+                <a
+                  href="${attachment.data}"
+                  download="${escapeHTML(attachment.name)}"
+                  class="text-[11px] font-bold text-[var(--brand)] hover:underline shrink-0"
+                >
+                  ⬇ Download
+                </a>
+              </div>
+            </div>
+          `;
+        } else if (isCode) {
+          attachmentHTML = `
+            <div class="mt-2 p-3 rounded-xl bg-black/40 border border-white/15 flex items-center justify-between gap-3 shadow-inner">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-2xl shrink-0">💻</span>
+                <div class="min-w-0">
+                  <p class="text-xs font-mono font-bold truncate text-[var(--brand)]">${escapeHTML(attachment.name)}</p>
+                  <p class="text-[10px] text-[var(--muted)]">${formatBytes(attachment.size)} · Code/Text File</p>
+                </div>
+              </div>
+              <a
+                href="${attachment.data}"
+                download="${escapeHTML(attachment.name)}"
+                class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--brand)] text-black hover:opacity-90 transition shrink-0 flex items-center gap-1"
+              >
+                ⬇ Download
+              </a>
+            </div>
+          `;
+        } else {
+          attachmentHTML = `
+            <div class="mt-2 p-3 rounded-xl bg-black/40 border border-white/15 flex items-center justify-between gap-3 shadow-inner">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-2xl shrink-0">📄</span>
+                <div class="min-w-0">
+                  <p class="text-xs font-semibold truncate text-white">${escapeHTML(attachment.name)}</p>
+                  <p class="text-[10px] text-[var(--muted)]">${formatBytes(attachment.size)} · Document</p>
+                </div>
+              </div>
+              <a
+                href="${attachment.data}"
+                download="${escapeHTML(attachment.name)}"
+                class="px-3 py-1.5 rounded-lg text-xs font-bold bg-[var(--brand)] text-black hover:opacity-90 transition shrink-0 flex items-center gap-1"
+              >
+                ⬇ Download
+              </a>
+            </div>
+          `;
+        }
+      }
+
+      return `
         <div class="flex ${message.mine ? "justify-end" : "justify-start"} mb-3">
           <div class="max-w-[78%]">
             <div
@@ -598,7 +797,8 @@ function renderChatMessages() {
                   : "bg-white/[0.07] border border-[var(--border)] text-white rounded-bl-md"
               }"
             >
-              ${escapeHTML(message.text)}
+              ${messageText ? escapeHTML(messageText) : ""}
+              ${attachmentHTML}
             </div>
 
             <p class="text-[10px] text-[var(--muted2)] mt-1 ${
@@ -608,8 +808,8 @@ function renderChatMessages() {
             </p>
           </div>
         </div>
-      `
-    )
+      `;
+    })
     .join("");
 
   container.scrollTop = container.scrollHeight;
@@ -626,7 +826,11 @@ async function sendMessage(event) {
   if (!input) return;
 
   const text = input.value.trim();
-  if (!text) return;
+
+  if (!text && !selectedFile) {
+    showToast("Please enter a message or attach a file.", "info");
+    return;
+  }
 
   if (!activeConversationId) {
     showToast("Select a conversation first.", "info");
@@ -636,15 +840,41 @@ async function sendMessage(event) {
   const chat = conversations.find((c) => c.id === activeConversationId);
   if (!chat) return;
 
+  let fileAttachment = null;
+  if (selectedFile) {
+    try {
+      const base64Data = await readFileAsBase64(selectedFile);
+      fileAttachment = {
+        name: selectedFile.name,
+        size: selectedFile.size,
+        type: selectedFile.type || "application/octet-stream",
+        data: base64Data,
+      };
+    } catch (err) {
+      console.error("Error reading file:", err);
+      showToast("Failed to process selected file.", "info");
+      return;
+    }
+  }
+
+  let finalContent = text;
+  if (fileAttachment) {
+    finalContent = JSON.stringify({
+      text: text,
+      attachment: fileAttachment,
+    });
+  }
+
   input.value = "";
+  clearSelectedFile();
 
   // Optimistic UI update with milliseconds
   const newMessageObj = {
     sender: "You",
     senderId: currentUser.id,
     mine: true,
-    text: text,
-    time: formatTimeWithMs() // Current time with milliseconds
+    text: finalContent,
+    time: formatTimeWithMs(),
   };
 
   chat.messages.push(newMessageObj);
@@ -658,7 +888,7 @@ async function sendMessage(event) {
       sender_id: currentUser.id,
       receiver_id: chat.type === "leader" ? chat.targetUserId : null,
       type: chat.type,
-      content: text,
+      content: finalContent,
     };
 
     const { data, error } = await supabaseClient
@@ -669,16 +899,24 @@ async function sendMessage(event) {
 
     if (error) {
       console.error("Failed to store message in Supabase:", error);
-      showToast("Could not send message. Please ensure 'messages' table exists in Supabase.", "info");
+      showToast("Could not send message.", "info");
     } else if (data) {
       newMessageObj.id = data.id;
-      // Update with exact server time including ms
       newMessageObj.time = formatTimeWithMs(data.created_at);
-      renderChatMessages(); 
+      renderChatMessages();
     }
   } catch (err) {
     console.error("Error inserting message:", err);
   }
+}
+
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
 }
 
 /* =========================================================
