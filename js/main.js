@@ -566,6 +566,54 @@ async function createProjectFromForm() {
   return project;
 }
 
+/* =========================================================
+   DYNAMIC CURRENT TEAM DISPLAY (LEADER DATA)
+   ========================================================= */
+
+async function renderCurrentTeamForWizard() {
+  const container = document.getElementById("ct-current-team");
+  if (!container) return;
+
+  try {
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
+    if (!user) return;
+
+    const { data: profile } = await supabaseClient
+      .from("profiles")
+      .select("name, skills")
+      .eq("id", user.id)
+      .single();
+
+    const name = profile?.name || "Project Leader";
+    const skills = Array.isArray(profile?.skills)
+      ? profile.skills.join(", ")
+      : profile?.skills || "Leader";
+    const initial = name[0].toUpperCase();
+
+    container.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="avatar w-8 h-8 rounded-full text-xs bg-[var(--brand)] text-black font-bold flex items-center justify-center">
+          ${initial}
+        </div>
+        <p class="text-sm font-semibold text-[var(--text)]">
+          ${name} <span class="text-[var(--muted)] font-normal">— ${skills}</span>
+        </p>
+      </div>
+    `;
+  } catch (err) {
+    console.error("Error rendering current team leader:", err);
+  }
+}
+
+// Modify startCreateTeamFlow to trigger the leader rendering
+const originalStartCreateTeamFlow = startCreateTeamFlow;
+startCreateTeamFlow = function () {
+  originalStartCreateTeamFlow();
+  renderCurrentTeamForWizard();
+};
+
 /* ============================= SKILL GAP ============================= */
 async function renderSkillGap() {
   try {
@@ -579,7 +627,45 @@ async function renderSkillGap() {
       return;
     }
 
-    // Get the latest project created by this user
+    // 1. Fetch current leader profile
+    const { data: leaderProfile, error: leaderError } = await supabaseClient
+      .from("profiles")
+      .select("id, name, skills")
+      .eq("id", user.id)
+      .single();
+
+    if (leaderError) {
+      console.error("Leader profile load error:", leaderError);
+    }
+
+    // 2. Render ONLY the Leader in the "Current Team" box
+    const skillGapTeamContainer = document.getElementById(
+      "skill-gap-current-team",
+    );
+
+    if (skillGapTeamContainer) {
+      const leaderName = leaderProfile?.name || "Project Leader";
+      const leaderSkills = Array.isArray(leaderProfile?.skills)
+        ? leaderProfile.skills.join(" · ")
+        : typeof leaderProfile?.skills === "string"
+          ? leaderProfile.skills
+          : "Leader";
+      const initial = leaderName[0].toUpperCase();
+
+      skillGapTeamContainer.innerHTML = `
+        <div class="flex items-center gap-3">
+          <div class="avatar w-10 h-10 rounded-full bg-[var(--brand)] text-black font-bold flex items-center justify-center">
+            ${initial}
+          </div>
+          <div>
+            <p class="font-semibold text-sm text-[var(--text)]">${leaderName}</p>
+            <p class="text-xs text-[var(--muted)]">${leaderSkills}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // 3. Fetch the latest project created by this user
     const { data: projects, error: projectError } = await supabaseClient
       .from("projects")
       .select(
@@ -588,9 +674,6 @@ async function renderSkillGap() {
           name,
           project_skills (
             skill
-          ),
-          team_members (
-            user_id
           )
         `,
       )
@@ -598,73 +681,38 @@ async function renderSkillGap() {
       .order("created_at", { ascending: false })
       .limit(1);
 
-    if (projectError) {
-      console.error("Skill gap project error:", projectError);
-      return;
-    }
-
-    if (!projects || projects.length === 0) {
-      console.warn("No project found for skill gap.");
+    if (projectError || !projects || projects.length === 0) {
+      console.warn("No project found for skill gap analysis.");
       return;
     }
 
     const project = projects[0];
 
-    console.log("Skill gap project:", project);
-
-    // Required skills from the project
+    // Required skills set in the project setup wizard
     const requiredSkills = (project.project_skills || [])
       .map((item) => item.skill)
       .filter(Boolean);
 
-    // Team member IDs
-    const memberIds = (project.team_members || [])
-      .map((member) => member.user_id)
-      .filter(Boolean);
-
-    console.log("Required skills:", requiredSkills);
-    console.log("Team member IDs:", memberIds);
-
-    // Get profiles of current team members
-    let teamProfiles = [];
-
-    if (memberIds.length > 0) {
-      const { data, error: profileError } = await supabaseClient
-        .from("profiles")
-        .select("id, name, skills")
-        .in("id", memberIds);
-
-      if (profileError) {
-        console.error("Team profiles error:", profileError);
-        return;
-      }
-
-      teamProfiles = data || [];
-    }
-
-    console.log("Team profiles:", teamProfiles);
-
-    // Combine all skills possessed by the current team
-    const teamSkills = [
-      ...new Set(teamProfiles.flatMap((member) => member.skills || [])),
-    ];
-
-    console.log("Combined team skills:", teamSkills);
-
-    // Compare required skills against team skills
-    const normalizedTeamSkills = teamSkills.map((skill) =>
-      skill.trim().toLowerCase(),
+    // Extract leader skills for skill gap comparison
+    const leaderSkillList = (leaderProfile?.skills || []).map((s) =>
+      typeof s === "string" ? s.trim().toLowerCase() : "",
     );
+
+    const missingSkills = [];
 
     const gapRows = requiredSkills.map((skill) => {
       const normalizedRequired = skill.trim().toLowerCase();
 
-      const covered = normalizedTeamSkills.some(
-        (teamSkill) =>
-          teamSkill === normalizedRequired ||
-          teamSkill.includes(normalizedRequired) ||
-          normalizedRequired.includes(teamSkill),
+      const covered = leaderSkillList.some(
+        (leaderSkill) =>
+          leaderSkill === normalizedRequired ||
+          leaderSkill.includes(normalizedRequired) ||
+          normalizedRequired.includes(leaderSkill),
       );
+
+      if (!covered) {
+        missingSkills.push(skill);
+      }
 
       return {
         label: skill,
@@ -672,12 +720,19 @@ async function renderSkillGap() {
       };
     });
 
-    const list = document.getElementById("skill-gap-list");
-
-    if (!list) {
-      console.error("skill-gap-list element not found.");
-      return;
+    // Update dynamic banner warning message
+    const warningMessage = document.getElementById("skill-gap-message");
+    if (warningMessage) {
+      if (missingSkills.length > 0) {
+        warningMessage.textContent = `⚠️ Your team is missing ${missingSkills.join(" and ")} expertise.`;
+      } else {
+        warningMessage.textContent = `🎉 Your current skills cover all required project skills!`;
+      }
     }
+
+    // Render skill coverage checklist
+    const list = document.getElementById("skill-gap-list");
+    if (!list) return;
 
     list.innerHTML = gapRows
       .map((row) => {
