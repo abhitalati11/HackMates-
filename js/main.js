@@ -1112,7 +1112,7 @@ async function getRecommendedTeammates(limit = 6) {
       availability: s.availability,
       skill_level: "Intermediate",
       about: s.about,
-      college: s.college
+      college: s.college,
     }));
   }
 
@@ -1501,28 +1501,43 @@ async function viewProfile(id) {
         const skillsArr = Array.isArray(p.skills)
           ? p.skills
           : typeof p.skills === "string"
-          ? p.skills.split(",").map((x) => x.trim()).filter(Boolean)
-          : ["Development"];
+            ? p.skills
+                .split(",")
+                .map((x) => x.trim())
+                .filter(Boolean)
+            : ["Development"];
 
         const projectsArr = Array.isArray(p.projects)
           ? p.projects
           : typeof p.projects === "string"
-          ? p.projects.split(",").map((x) => x.trim()).filter(Boolean)
-          : ["Portfolio Project"];
+            ? p.projects
+                .split(",")
+                .map((x) => x.trim())
+                .filter(Boolean)
+            : ["Portfolio Project"];
 
         const hackathonsArr = Array.isArray(p.hackathons)
           ? p.hackathons
           : typeof p.hackathons === "string"
-          ? p.hackathons.split(",").map((x) => x.trim()).filter(Boolean)
-          : ["Hackathon Participant"];
+            ? p.hackathons
+                .split(",")
+                .map((x) => x.trim())
+                .filter(Boolean)
+            : ["Hackathon Participant"];
 
         const interestsArr = Array.isArray(p.interests)
           ? p.interests
           : typeof p.interests === "string"
-          ? p.interests.split(",").map((x) => x.trim()).filter(Boolean)
-          : ["Tech", "Innovation"];
+            ? p.interests
+                .split(",")
+                .map((x) => x.trim())
+                .filter(Boolean)
+            : ["Tech", "Innovation"];
 
-        const skillLevelsObj = p.skill_levels || p.skillLevels || Object.fromEntries(skillsArr.map((sk) => [sk, 85]));
+        const skillLevelsObj =
+          p.skill_levels ||
+          p.skillLevels ||
+          Object.fromEntries(skillsArr.map((sk) => [sk, 85]));
 
         s = {
           id: p.id,
@@ -1532,7 +1547,10 @@ async function viewProfile(id) {
           college: p.college || "University",
           branch: p.branch || "Computer Science",
           year: p.year || "3rd Year",
-          about: p.about || p.bio || "Passionate software developer interested in building innovative projects and collaborating with high-performing teams.",
+          about:
+            p.about ||
+            p.bio ||
+            "Passionate software developer interested in building innovative projects and collaborating with high-performing teams.",
           skills: skillsArr,
           skillLevels: skillLevelsObj,
           projects: projectsArr,
@@ -1559,16 +1577,17 @@ async function viewProfile(id) {
       college: "Engineering College",
       branch: "Computer Science",
       year: "3rd Year",
-      about: "Passionate developer eager to collaborate on hackathons and team projects.",
+      about:
+        "Passionate developer eager to collaborate on hackathons and team projects.",
       skills: ["Full Stack", "JavaScript", "Python"],
-      skillLevels: { "JavaScript": 88, "Python": 82, "Web Dev": 85 },
+      skillLevels: { JavaScript: 88, Python: 82, "Web Dev": 85 },
       projects: ["Web App"],
       hackathons: ["Tech Hackathon 2024"],
       interests: ["AI", "Web Development"],
       availability: "10-15 hrs/week",
       github: "github.com",
       linkedin: "linkedin.com",
-      why: "Strong technical skills and good availability for team projects."
+      why: "Strong technical skills and good availability for team projects.",
     };
   }
 
@@ -1627,9 +1646,9 @@ async function viewProfile(id) {
 
   <div class="glass-strong rounded-2xl p-6 flex flex-wrap gap-x-10 gap-y-4 text-sm">
     <div><p class="text-[var(--muted)] text-xs mb-1">Available</p><p class="font-medium">${s.availability || "10-15 hrs/week"}</p></div>
-    <div><p class="text-[var(--muted)] text-xs mb-1">Interested in</p><p class="font-medium">${Array.isArray(s.interests) ? s.interests.join(" • ") : (s.interests || "Tech")}</p></div>
-    <div><p class="text-[var(--muted)] text-xs mb-1">GitHub</p><p class="font-medium text-[var(--brand)]">${s.github && s.github !== "N/A" ? `<a href="${s.github.startsWith('http') ? s.github : 'https://' + s.github}" target="_blank" rel="noopener noreferrer" class="hover:underline">${s.github}</a>` : '<span class="text-[var(--muted)]">N/A</span>'}</p></div>
-    <div><p class="text-[var(--muted)] text-xs mb-1">LinkedIn</p><p class="font-medium text-[var(--brand)]">${s.linkedin && s.linkedin !== "N/A" ? `<a href="${s.linkedin.startsWith('http') ? s.linkedin : 'https://' + s.linkedin}" target="_blank" rel="noopener noreferrer" class="hover:underline">${s.linkedin}</a>` : '<span class="text-[var(--muted)]">N/A</span>'}</p></div>
+    <div><p class="text-[var(--muted)] text-xs mb-1">Interested in</p><p class="font-medium">${Array.isArray(s.interests) ? s.interests.join(" • ") : s.interests || "Tech"}</p></div>
+    <div><p class="text-[var(--muted)] text-xs mb-1">GitHub</p><p class="font-medium text-[var(--brand)]">${s.github && s.github !== "N/A" ? `<a href="${s.github.startsWith("http") ? s.github : "https://" + s.github}" target="_blank" rel="noopener noreferrer" class="hover:underline">${s.github}</a>` : '<span class="text-[var(--muted)]">N/A</span>'}</p></div>
+    <div><p class="text-[var(--muted)] text-xs mb-1">LinkedIn</p><p class="font-medium text-[var(--brand)]">${s.linkedin && s.linkedin !== "N/A" ? `<a href="${s.linkedin.startsWith("http") ? s.linkedin : "https://" + s.linkedin}" target="_blank" rel="noopener noreferrer" class="hover:underline">${s.linkedin}</a>` : '<span class="text-[var(--muted)]">N/A</span>'}</p></div>
   </div>
   `;
 
@@ -1919,12 +1938,15 @@ async function viewTeam(projectId) {
   showScreen("team-details");
 
   try {
-    const { data: { user } } = await supabaseClient.auth.getUser();
+    const {
+      data: { user },
+    } = await supabaseClient.auth.getUser();
 
     // 1. Fetch project details
     const { data: project, error } = await supabaseClient
       .from("projects")
-      .select(`
+      .select(
+        `
         id,
         name,
         description,
@@ -1934,7 +1956,8 @@ async function viewTeam(projectId) {
         project_skills ( skill ),
         project_roles ( role ),
         team_members ( user_id )
-      `)
+      `,
+      )
       .eq("id", projectId)
       .single();
 
@@ -1945,9 +1968,10 @@ async function viewTeam(projectId) {
 
     // 2. Fallback check for static mock data if available
     let teamData = project;
-    const staticTeam = typeof teamsData !== "undefined" 
-      ? teamsData.find(t => String(t.id) === String(projectId)) 
-      : null;
+    const staticTeam =
+      typeof teamsData !== "undefined"
+        ? teamsData.find((t) => String(t.id) === String(projectId))
+        : null;
 
     const memberIds = (project.team_members || []).map((m) => m.user_id);
 
@@ -1970,7 +1994,7 @@ async function viewTeam(projectId) {
       ["Frontend", 90],
       ["Backend", 82],
       ["ML / AI", 68],
-      ["UI / UX", 30]
+      ["UI / UX", 30],
     ];
 
     // Render full team view matching screenshot layout
@@ -2032,10 +2056,14 @@ async function viewTeam(projectId) {
         <div class="flex flex-wrap gap-2 mb-8">
           ${
             lookingFor.length > 0
-              ? lookingFor.map((r) => `
+              ? lookingFor
+                  .map(
+                    (r) => `
                   <span class="px-4 py-2 rounded-full text-xs font-medium border border-[rgba(248,113,113,0.3)] bg-[rgba(248,113,113,0.08)] text-[#fca5a5] flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-[var(--red)]"></span> ${r}
-                  </span>`).join("")
+                  </span>`,
+                  )
+                  .join("")
               : `
                 <span class="px-4 py-2 rounded-full text-xs font-medium border border-[rgba(248,113,113,0.3)] bg-[rgba(248,113,113,0.08)] text-[#fca5a5] flex items-center gap-2">
                   <span class="w-2 h-2 rounded-full bg-red-400"></span> ML Engineer
@@ -2051,10 +2079,14 @@ async function viewTeam(projectId) {
         <div class="flex flex-wrap gap-2">
           ${
             requiredSkills.length > 0
-              ? requiredSkills.map((s) => `
+              ? requiredSkills
+                  .map(
+                    (s) => `
                   <span class="px-4 py-2 rounded-2xl text-xs font-medium border border-white/10 bg-white/5 text-gray-200">
                     ${s}
-                  </span>`).join("")
+                  </span>`,
+                  )
+                  .join("")
               : `
                 <span class="px-4 py-2 rounded-2xl text-xs font-medium border border-white/10 bg-white/5 text-gray-200">Python</span>
                 <span class="px-4 py-2 rounded-2xl text-xs font-medium border border-white/10 bg-white/5 text-gray-200">Machine Learning</span>
@@ -2122,7 +2154,6 @@ async function viewTeam(projectId) {
         bar.style.width = bar.dataset.w;
       });
     }, 100);
-
   } catch (err) {
     console.error("Error viewing team details:", err);
     content.innerHTML = `<div class="text-center py-16 text-[var(--muted)]">Error loading project.</div>`;
@@ -2603,6 +2634,132 @@ async function renderDashboard() {
        EDIT PROFILE
        ========================================================= */
 
+/* ---- Skill Builder Helpers ---- */
+
+// Level badge colours
+const LEVEL_COLORS = {
+  Beginner: "rgba(100,149,237,0.15)",
+  Intermediate: "rgba(181,255,0,0.12)",
+  Advanced: "rgba(255,170,0,0.15)",
+};
+const LEVEL_TEXT = {
+  Beginner: "#64a0ff",
+  Intermediate: "var(--brand)",
+  Advanced: "#ffaa00",
+};
+
+function addSkillRow(skillData = {}) {
+  const builder = document.getElementById("skills-builder");
+  if (!builder) return;
+  const idx = Date.now();
+  const name = skillData.name || "";
+  const level = skillData.level || "Intermediate";
+  const experience = skillData.experience || "";
+  const row = document.createElement("div");
+  row.className = "skill-row";
+  row.dataset.idx = idx;
+  row.innerHTML = `
+    <div class="glass rounded-xl p-4 border border-[var(--border)] hover:border-[rgba(181,255,0,0.35)] transition">
+      <div class="flex flex-col sm:flex-row gap-3 mb-2">
+        <input
+          type="text"
+          value="${name}"
+          placeholder="Skill name (e.g. React, Python)"
+          class="skill-name flex-1 px-3 py-2 rounded-lg border border-[var(--border)] text-sm bg-transparent focus:border-[var(--brand)] outline-none"
+        />
+        <select class="skill-level px-3 py-2 rounded-lg border border-[var(--border)] text-sm bg-transparent focus:border-[var(--brand)] outline-none">
+          <option${level === "Beginner" ? " selected" : ""}>Beginner</option>
+          <option${level === "Intermediate" ? " selected" : ""}>Intermediate</option>
+          <option${level === "Advanced" ? " selected" : ""}>Advanced</option>
+        </select>
+        <button type="button" onclick="removeSkillRow(${idx})" class="text-[var(--muted)] hover:text-red-400 transition text-xs font-medium px-2 py-1 rounded cursor-pointer whitespace-nowrap">
+          Remove
+        </button>
+      </div>
+      <textarea
+        placeholder="Brief experience (e.g. Built 3 automation scripts, contributed to open source)"
+        rows="2"
+        class="skill-experience w-full px-3 py-2 rounded-lg border border-[var(--border)] text-xs bg-transparent focus:border-[var(--brand)] outline-none resize-none text-[var(--muted)] leading-relaxed placeholder:text-[var(--muted2)]"
+      >${experience}</textarea>
+    </div>
+  `;
+  builder.appendChild(row);
+}
+
+function removeSkillRow(idx) {
+  const row = document.querySelector(`.skill-row[data-idx="${idx}"]`);
+  if (row) row.remove();
+}
+
+function collectSkills() {
+  const rows = document.querySelectorAll(".skill-row");
+  const skills = [];
+  rows.forEach((row) => {
+    const name = row.querySelector(".skill-name")?.value?.trim() || "";
+    const level = row.querySelector(".skill-level")?.value || "Intermediate";
+    const experience =
+      row.querySelector(".skill-experience")?.value?.trim() || "";
+    if (name) skills.push({ name, level, experience });
+  });
+  return skills;
+}
+
+function renderSkillsBuilder(skills = []) {
+  const builder = document.getElementById("skills-builder");
+  if (!builder) return;
+  builder.innerHTML = "";
+  if (skills.length === 0) {
+    addSkillRow();
+  } else {
+    skills.forEach((s) => addSkillRow(s));
+  }
+}
+
+/* Render skill chips + level badge for My Profile header */
+function renderSkillsDisplay(skills = []) {
+  const chipBox = document.getElementById("profile-display-skills");
+  if (chipBox) {
+    chipBox.innerHTML = skills.length
+      ? skills
+          .map((s) => {
+            const name = typeof s === "string" ? s : s.name;
+            return `<span class="chip-static">${name}</span>`;
+          })
+          .join("")
+      : `<span class="text-xs text-[var(--muted)]">No skills added yet</span>`;
+  }
+
+  // Rich skill detail cards
+  const detailBox = document.getElementById("profile-display-skills-detail");
+  if (!detailBox) return;
+  if (skills.length === 0) {
+    detailBox.innerHTML = "";
+    return;
+  }
+  detailBox.innerHTML = `
+    <div class="grid sm:grid-cols-2 gap-3">
+      ${skills
+        .map((s) => {
+          const name = typeof s === "string" ? s : s.name;
+          const level =
+            typeof s === "object" ? s.level || "Intermediate" : "Intermediate";
+          const exp = typeof s === "object" ? s.experience || "" : "";
+          const bg = LEVEL_COLORS[level] || LEVEL_COLORS.Intermediate;
+          const textColor = LEVEL_TEXT[level] || LEVEL_TEXT.Intermediate;
+          return `
+        <div class="glass rounded-xl p-4 border border-[var(--border)]">
+          <div class="flex items-center justify-between mb-1">
+            <p class="text-sm font-semibold text-[var(--text)]">${name}</p>
+            <span style="background:${bg}; color:${textColor}; border:1px solid ${textColor}40;" class="text-[10px] font-bold px-2 py-0.5 rounded-full">${level}</span>
+          </div>
+          ${exp ? `<p class="text-xs text-[var(--muted)] leading-relaxed">${exp}</p>` : `<p class="text-xs text-[var(--muted2)] italic">Experience not added yet.</p>`}
+        </div>`;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
 function openEditProfile() {
   const panel = document.getElementById("edit-profile-panel");
 
@@ -2642,11 +2799,10 @@ async function saveProfile(event) {
 
   const year = document.getElementById("profile-year").value;
 
-  const skills = document
-    .getElementById("profile-skills")
-    .value.split(",")
-    .map((skill) => skill.trim())
-    .filter(Boolean);
+  // Collect structured skills from builder
+  const skillObjects = collectSkills();
+  // Flat skill names array for backwards compatibility
+  const skillNames = skillObjects.map((s) => s.name);
 
   const role = document.getElementById("profile-role").value;
 
@@ -2654,14 +2810,17 @@ async function saveProfile(event) {
 
   const github = document.getElementById("profile-github")?.value.trim() || "";
 
-  const linkedin = document.getElementById("profile-linkedin")?.value.trim() || "";
+  const linkedin =
+    document.getElementById("profile-linkedin")?.value.trim() || "";
 
   const skillLevel =
     document.querySelector('input[name="skillLevel"]:checked')?.value ||
+    skillObjects[0]?.level ||
     "Intermediate";
 
   const availability =
     document.querySelector('input[name="availability"]:checked')?.value ||
+    document.getElementById("profile-availability")?.value ||
     "10–15 hrs/week";
 
   /* ================================
@@ -2682,22 +2841,14 @@ async function saveProfile(event) {
      SAVE PROFILE TO SUPABASE
      ================================ */
 
-  console.log("Current user:", user);
-  console.log("User error:", userError);
-
-  if (userError || !user) {
-    console.error("No authenticated user:", userError);
-    showToast("You are not logged in.", "info");
-    return;
-  }
-
   const profileData = {
     id: user.id,
     name,
     college,
     branch,
     year,
-    skills,
+    skills: skillNames,
+    skill_details: skillObjects,
     role,
     interests,
     github,
@@ -2706,20 +2857,16 @@ async function saveProfile(event) {
     availability,
   };
 
-  console.log("Sending profile:", profileData);
-
   const { data, error } = await supabaseClient
     .from("profiles")
     .upsert(profileData)
     .select();
 
-  console.log("Supabase response:", data);
-  console.log("Supabase error:", error);
-
   if (error) {
     showToast(`Profile error: ${error.message}`, "info");
     return;
   }
+
   /* ================================
      UPDATE PROFILE SUMMARY
      ================================ */
@@ -2740,30 +2887,19 @@ async function saveProfile(event) {
   const ghDisplay = document.getElementById("profile-display-github");
   if (ghDisplay) {
     ghDisplay.innerHTML = github
-      ? `<a href="${github.startsWith('http') ? github : 'https://' + github}" target="_blank" rel="noopener noreferrer" class="hover:underline">${github}</a>`
+      ? `<a href="${github.startsWith("http") ? github : "https://" + github}" target="_blank" rel="noopener noreferrer" class="hover:underline">${github}</a>`
       : "Not added";
   }
 
   const liDisplay = document.getElementById("profile-display-linkedin");
   if (liDisplay) {
     liDisplay.innerHTML = linkedin
-      ? `<a href="${linkedin.startsWith('http') ? linkedin : 'https://' + linkedin}" target="_blank" rel="noopener noreferrer" class="hover:underline">${linkedin}</a>`
+      ? `<a href="${linkedin.startsWith("http") ? linkedin : "https://" + linkedin}" target="_blank" rel="noopener noreferrer" class="hover:underline">${linkedin}</a>`
       : "Not added";
   }
 
-  /* ================================
-     UPDATE SKILL CHIPS
-     ================================ */
-
-  const skillBox = document.getElementById("profile-display-skills");
-
-  skillBox.innerHTML = skills.length
-    ? skills
-        .map((skill) => `<span class="chip-static">${skill}</span>`)
-        .join("")
-    : `<span class="text-xs text-[var(--muted)]">
-         No skills added yet
-       </span>`;
+  // Render rich skill display
+  renderSkillsDisplay(skillObjects);
 
   /* ================================
      UPDATE AVATAR
@@ -2795,17 +2931,9 @@ async function saveProfile(event) {
   const sidebarRole = document.getElementById("sidebar-role");
   const sidebarAvatar = document.getElementById("sidebar-avatar");
 
-  if (sidebarName) {
-    sidebarName.textContent = name;
-  }
-
-  if (sidebarRole) {
-    sidebarRole.textContent = role;
-  }
-
-  if (sidebarAvatar) {
-    sidebarAvatar.textContent = initials || "V";
-  }
+  if (sidebarName) sidebarName.textContent = name;
+  if (sidebarRole) sidebarRole.textContent = role;
+  if (sidebarAvatar) sidebarAvatar.textContent = initials || "V";
 
   /* ================================
      CLOSE + SUCCESS
@@ -2842,6 +2970,7 @@ async function loadProfileFromSupabase() {
       branch,
       year,
       skills,
+      skill_details,
       role,
       interests,
       github,
@@ -2861,8 +2990,6 @@ async function loadProfileFromSupabase() {
 
   if (!profile) return;
 
-  console.log("Loaded profile from Supabase:", profile);
-
   // -----------------------------
   // Fill edit form
   // -----------------------------
@@ -2871,7 +2998,6 @@ async function loadProfileFromSupabase() {
   const collegeInput = document.getElementById("profile-college");
   const branchInput = document.getElementById("profile-branch");
   const yearInput = document.getElementById("profile-year");
-  const skillsInput = document.getElementById("profile-skills");
   const roleInput = document.getElementById("profile-role");
   const interestsInput = document.getElementById("profile-interests");
   const githubInput = document.getElementById("profile-github");
@@ -2881,42 +3007,42 @@ async function loadProfileFromSupabase() {
   if (collegeInput) collegeInput.value = profile.college || "";
   if (branchInput) branchInput.value = profile.branch || "";
   if (yearInput) yearInput.value = profile.year || "";
-
-  if (skillsInput) {
-    skillsInput.value = (profile.skills || []).join(", ");
-  }
-
   if (roleInput) roleInput.value = profile.role || "";
+  if (interestsInput) interestsInput.value = profile.interests || "";
+  if (githubInput) githubInput.value = profile.github || "";
+  if (linkedinInput) linkedinInput.value = profile.linkedin || "";
 
-  if (interestsInput) {
-    interestsInput.value = profile.interests || "";
+  // Populate skills builder with structured data
+  const skillDetails =
+    Array.isArray(profile.skill_details) && profile.skill_details.length > 0
+      ? profile.skill_details
+      : (profile.skills || []).map((name) => ({
+          name,
+          level: "Intermediate",
+          experience: "",
+        }));
+
+  renderSkillsBuilder(skillDetails);
+
+  // Availability select fallback
+  const availInput = document.getElementById("profile-availability");
+  if (availInput && profile.availability) {
+    availInput.value = profile.availability;
   }
 
-  if (githubInput) {
-    githubInput.value = profile.github || "";
-  }
-
-  if (linkedinInput) {
-    linkedinInput.value = profile.linkedin || "";
-  }
-
-  // Skill level
+  // Skill level radio (legacy)
   if (profile.skill_level) {
     const skillRadio = document.querySelector(
       `input[name="skillLevel"][value="${profile.skill_level}"]`,
     );
-
-    if (skillRadio) {
-      skillRadio.checked = true;
-    }
+    if (skillRadio) skillRadio.checked = true;
   }
 
-  // Availability
+  // Availability radio (legacy)
   if (profile.availability) {
     const availabilityRadio = document.querySelector(
       `input[name="availability"][value="${profile.availability}"]`,
     );
-
     if (availabilityRadio) {
       availabilityRadio.checked = true;
     }
@@ -2959,13 +3085,13 @@ async function loadProfileFromSupabase() {
 
   if (displayGithub) {
     displayGithub.innerHTML = profile.github
-      ? `<a href="${profile.github.startsWith('http') ? profile.github : 'https://' + profile.github}" target="_blank" rel="noopener noreferrer" class="hover:underline">${profile.github}</a>`
+      ? `<a href="${profile.github.startsWith("http") ? profile.github : "https://" + profile.github}" target="_blank" rel="noopener noreferrer" class="hover:underline">${profile.github}</a>`
       : "Not added";
   }
 
   if (displayLinkedin) {
     displayLinkedin.innerHTML = profile.linkedin
-      ? `<a href="${profile.linkedin.startsWith('http') ? profile.linkedin : 'https://' + profile.linkedin}" target="_blank" rel="noopener noreferrer" class="hover:underline">${profile.linkedin}</a>`
+      ? `<a href="${profile.linkedin.startsWith("http") ? profile.linkedin : "https://" + profile.linkedin}" target="_blank" rel="noopener noreferrer" class="hover:underline">${profile.linkedin}</a>`
       : "Not added";
   }
 
