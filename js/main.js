@@ -2488,13 +2488,24 @@ async function respondInvite(requestId, accept) {
 
     if (updateErr) throw updateErr;
 
-    // 2. If accepted, insert sender into team_members
+    // 2. If accepted, determine who the member is and insert into team_members
     if (accept && request) {
+      const {
+        data: { user },
+      } = await supabaseClient.auth.getUser();
+
+      // If current user (who is accepting) is the receiver, they are the new team member.
+      // Otherwise, the sender is the new member.
+      const newMemberId =
+        request.receiver_id === user.id
+          ? request.receiver_id
+          : request.sender_id;
+
       const { error: memberErr } = await supabaseClient
         .from("team_members")
         .insert({
           project_id: request.project_id,
-          user_id: request.sender_id,
+          user_id: newMemberId,
         });
 
       if (memberErr && memberErr.code !== "23505") {
