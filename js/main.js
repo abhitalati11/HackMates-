@@ -750,132 +750,113 @@ function renderRecommendationsFromMatches(matches, animate = true) {
         <div
           class="rounded-2xl border border-white/10 bg-white/[0.03] p-5
                  hover:border-[rgba(181,255,0,0.35)]
-                 hover:bg-white/[0.045] transition-all duration-300"
+                 hover:bg-white/[0.045] transition-all duration-300 flex flex-col justify-between"
           style="${animate ? `animation: fadeInUp 0.4s ease ${index * 0.08}s both;` : ""}"
         >
+          <div>
+            <!-- HEADER -->
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3 min-w-0">
+                <div
+                  class="w-11 h-11 rounded-xl flex items-center justify-center
+                         bg-[var(--brand)] text-black font-bold text-sm shrink-0"
+                >
+                  ${initials}
+                </div>
 
-          <!-- HEADER -->
-          <div class="flex items-center justify-between gap-4">
-
-            <div class="flex items-center gap-3 min-w-0">
-
-              <div
-                class="w-11 h-11 rounded-xl flex items-center justify-center
-                       bg-[var(--brand)] text-black font-bold text-sm shrink-0"
-              >
-                ${initials}
+                <div class="min-w-0">
+                  <h3 class="font-semibold text-[var(--text)] truncate">
+                    ${candidate.name || "Student"}
+                  </h3>
+                  <p class="text-sm text-[var(--muted)] truncate">
+                    ${candidate.role || "Team Member"}
+                  </p>
+                </div>
               </div>
 
-              <div class="min-w-0">
-                <h3 class="font-semibold text-[var(--text)] truncate">
-                  ${candidate.name || "Student"}
-                </h3>
-
-                <p class="text-sm text-[var(--muted)] truncate">
-                  ${candidate.role || "Team Member"}
-                </p>
-              </div>
-
-            </div>
-
-            <!-- SCORE -->
-            <div class="text-right shrink-0">
-              <div class="text-2xl font-bold text-[var(--brand)]">
-                ${candidate.matchScore}%
-              </div>
-
-              <div class="text-[11px] text-[var(--muted)] uppercase tracking-wide">
-                Match
+              <!-- SCORE -->
+              <div class="text-right shrink-0">
+                <div class="text-2xl font-bold text-[var(--brand)]">
+                  ${candidate.matchScore}%
+                </div>
+                <div class="text-[11px] text-[var(--muted)] uppercase tracking-wide">
+                  Match
+                </div>
               </div>
             </div>
 
-          </div>
+            <!-- SKILLS -->
+            <div class="mt-5 flex flex-wrap gap-2">
+              ${skills
+                .slice(0, 5)
+                .map(
+                  (skill) => `
+                    <span
+                      class="px-3 py-1 rounded-full text-xs
+                             border border-white/10
+                             bg-white/[0.04]
+                             text-[var(--text)]"
+                    >
+                      ${skill}
+                    </span>
+                  `,
+                )
+                .join("")}
+            </div>
 
-
-          <!-- SKILLS -->
-          <div class="mt-5 flex flex-wrap gap-2">
-
-            ${skills
-              .slice(0, 5)
-              .map(
-                (skill) => `
-                  <span
-                    class="px-3 py-1 rounded-full text-xs
-                           border border-white/10
-                           bg-white/[0.04]
-                           text-[var(--text)]"
-                  >
-                    ${skill}
-                  </span>
-                `,
-              )
-              .join("")}
-
-          </div>
-
-
-          <!-- MATCHED SKILLS -->
-          ${
-            candidate.matchedSkills && candidate.matchedSkills.length
-              ? `
-                <div class="mt-5">
-                  <div class="text-xs text-[var(--muted)] mb-2">
-                    Matched skills
+            <!-- MATCHED SKILLS -->
+            ${
+              candidate.matchedSkills && candidate.matchedSkills.length
+                ? `
+                  <div class="mt-5">
+                    <div class="text-xs text-[var(--muted)] mb-2">
+                      Matched skills
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                      ${candidate.matchedSkills
+                        .map(
+                          (skill) => `
+                            <span
+                              class="px-2.5 py-1 rounded-lg text-xs
+                                     text-[var(--brand)]
+                                     bg-[rgba(181,255,0,0.08)]
+                                     border border-[rgba(181,255,0,0.2)]"
+                            >
+                              ✓ ${skill}
+                            </span>
+                          `,
+                        )
+                        .join("")}
+                    </div>
                   </div>
-
-                  <div class="flex flex-wrap gap-2">
-                    ${candidate.matchedSkills
-                      .map(
-                        (skill) => `
-                          <span
-                            class="px-2.5 py-1 rounded-lg text-xs
-                                   text-[var(--brand)]
-                                   bg-[rgba(181,255,0,0.08)]
-                                   border border-[rgba(181,255,0,0.2)]"
-                          >
-                            ✓ ${skill}
-                          </span>
-                        `,
-                      )
-                      .join("")}
+                `
+                : `
+                  <div class="mt-5 text-xs text-[var(--muted)]">
+                    Potential team fit
                   </div>
-                </div>
-              `
-              : `
-                <div class="mt-5 text-xs text-[var(--muted)]">
-                  Potential team fit
-                </div>
-              `
-          }
-
+                `
+            }
+          </div>
 
           <!-- FOOTER -->
-          <div
-  class="mt-5 pt-4 border-t border-white/10
-         flex items-center justify-between gap-3"
->
+          <div class="mt-5 pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onclick="viewProfile('${candidate.id}')"
+              class="btn-secondary flex-1 py-2.5 rounded-xl text-xs font-semibold cursor-pointer"
+            >
+              View Profile
+            </button>
 
-  <button
-    type="button"
-    onclick="openWhyModal('${candidate.id}')"
-    class="text-xs font-semibold text-[var(--brand)]
-           hover:underline"
-  >
-    Why this person →
-  </button>
-
-  <button
-    type="button"
-    onclick="addRecommendedTeammate('${candidate.id}', this)"
-    class="px-4 py-2 rounded-xl text-xs font-bold
-           bg-[var(--brand)] text-black
-           hover:opacity-90 transition"
-  >
-    + Add Teammate
-  </button>
-
-</div>
-
+            <button
+              type="button"
+              data-invite-btn="${candidate.id}"
+              onclick="addRecommendedTeammate('${candidate.id}', this)"
+              class="btn-primary flex-1 py-2.5 rounded-xl text-xs font-bold cursor-pointer"
+            >
+              + Add Teammate
+            </button>
+          </div>
         </div>
       `;
     })
@@ -1489,6 +1470,42 @@ async function viewProfile(id) {
   const idStr = String(id);
   let s = students.find((x) => String(x.id) === idStr);
 
+  // 1. If not in static mock data, check recommendations dynamically
+  if (!s) {
+    try {
+      const recs = await getRecommendedTeammates(10);
+      const matchedCand = recs.find((item) => String(item.id) === idStr);
+      if (matchedCand) {
+        s = {
+          id: matchedCand.id,
+          name: matchedCand.name,
+          role: matchedCand.role,
+          match: matchedCand.matchScore,
+          college: matchedCand.college || "University Candidate",
+          branch: matchedCand.branch,
+          year: matchedCand.year,
+          about:
+            matchedCand.about ||
+            "Matching student candidate for your active project requirements.",
+          skills: matchedCand.skills,
+          skillLevels: Object.fromEntries(
+            (matchedCand.skills || []).map((sk) => [sk, 85]),
+          ),
+          projects: ["Portfolio Project"],
+          hackathons: ["Hackathon Participant"],
+          interests: ["Tech", "Innovation"],
+          availability: matchedCand.availability,
+          github: "github.com",
+          linkedin: "linkedin.com",
+          why: `Recommended due to high skill compatibility (${matchedCand.matchScore}%) and strong coverage of your project's missing technical skills.`,
+        };
+      }
+    } catch (e) {
+      console.error("Error looking up candidate recommendation:", e);
+    }
+  }
+
+  // 2. Fetch directly from Supabase DB if still not resolved
   if (!s && typeof supabaseClient !== "undefined") {
     try {
       const { data: p } = await supabaseClient
@@ -1507,38 +1524,6 @@ async function viewProfile(id) {
                 .filter(Boolean)
             : ["Development"];
 
-        const projectsArr = Array.isArray(p.projects)
-          ? p.projects
-          : typeof p.projects === "string"
-            ? p.projects
-                .split(",")
-                .map((x) => x.trim())
-                .filter(Boolean)
-            : ["Portfolio Project"];
-
-        const hackathonsArr = Array.isArray(p.hackathons)
-          ? p.hackathons
-          : typeof p.hackathons === "string"
-            ? p.hackathons
-                .split(",")
-                .map((x) => x.trim())
-                .filter(Boolean)
-            : ["Hackathon Participant"];
-
-        const interestsArr = Array.isArray(p.interests)
-          ? p.interests
-          : typeof p.interests === "string"
-            ? p.interests
-                .split(",")
-                .map((x) => x.trim())
-                .filter(Boolean)
-            : ["Tech", "Innovation"];
-
-        const skillLevelsObj =
-          p.skill_levels ||
-          p.skillLevels ||
-          Object.fromEntries(skillsArr.map((sk) => [sk, 85]));
-
         s = {
           id: p.id,
           name: p.name || "Student Developer",
@@ -1550,16 +1535,18 @@ async function viewProfile(id) {
           about:
             p.about ||
             p.bio ||
-            "Passionate software developer interested in building innovative projects and collaborating with high-performing teams.",
+            "Passionate student developer ready to collaborate on innovative projects.",
           skills: skillsArr,
-          skillLevels: skillLevelsObj,
-          projects: projectsArr,
-          hackathons: hackathonsArr,
-          interests: interestsArr,
+          skillLevels: Object.fromEntries(skillsArr.map((sk) => [sk, 85])),
+          projects: ["Portfolio Project"],
+          hackathons: ["Hackathon Participant"],
+          interests: Array.isArray(p.interests)
+            ? p.interests
+            : [p.interests || "Tech"],
           availability: p.availability || "10–15 hrs/week",
           github: p.github || "github.com",
           linkedin: p.linkedin || "linkedin.com",
-          why: `${p.name || "This developer"} brings great experience in ${skillsArr.slice(0, 3).join(", ")}, strong collaboration skills, and excellent project availability.`,
+          why: `${p.name || "This developer"} brings relevant experience in ${skillsArr.slice(0, 3).join(", ")}, strong collaboration skills, and excellent availability.`,
         };
       }
     } catch (err) {
@@ -1567,7 +1554,7 @@ async function viewProfile(id) {
     }
   }
 
-  // Fallback profile if not found
+  // Fallback candidate object if missing
   if (!s) {
     s = {
       id: id,
@@ -1577,14 +1564,13 @@ async function viewProfile(id) {
       college: "Engineering College",
       branch: "Computer Science",
       year: "3rd Year",
-      about:
-        "Passionate developer eager to collaborate on hackathons and team projects.",
+      about: "Passionate developer eager to collaborate on team projects.",
       skills: ["Full Stack", "JavaScript", "Python"],
       skillLevels: { JavaScript: 88, Python: 82, "Web Dev": 85 },
       projects: ["Web App"],
       hackathons: ["Tech Hackathon 2024"],
       interests: ["AI", "Web Development"],
-      availability: "10-15 hrs/week",
+      availability: "10–15 hrs/week",
       github: "github.com",
       linkedin: "linkedin.com",
       why: "Strong technical skills and good availability for team projects.",
@@ -1598,7 +1584,9 @@ async function viewProfile(id) {
   content.innerHTML = `
   <div class="glass-strong rounded-3xl p-8 mb-6">
     <div class="flex flex-col sm:flex-row items-start gap-6 mb-6">
-      <div class="avatar w-24 h-24 rounded-2xl text-3xl font-bold bg-[var(--brand)] text-black flex items-center justify-center">${(s.name || "S")[0].toUpperCase()}</div>
+      <div class="avatar w-24 h-24 rounded-2xl text-3xl font-bold bg-[var(--brand)] text-black flex items-center justify-center">
+        ${(s.name || "S")[0].toUpperCase()}
+      </div>
       <div class="flex-1">
         <div class="flex items-center gap-3 flex-wrap mb-1">
           <h2 class="font-display font-bold text-2xl">${s.name}</h2>
@@ -1607,7 +1595,13 @@ async function viewProfile(id) {
         <p class="text-[var(--muted)] mb-1">${s.role}</p>
         <p class="text-[var(--muted)] text-sm">${s.college || "University"} · ${s.branch || "CS"} · ${s.year || "3rd Year"}</p>
       </div>
-      <button data-invite-btn="${s.id}" onclick="inviteStudent('${s.id}')" class="btn-primary px-6 py-3 rounded-xl text-sm whitespace-nowrap">Invite to Team</button>
+      <button 
+        data-invite-btn="${s.id}" 
+        onclick="addRecommendedTeammate('${s.id}', this)" 
+        class="btn-primary px-6 py-3 rounded-xl text-sm whitespace-nowrap cursor-pointer"
+      >
+        + Add Teammate
+      </button>
     </div>
     <p class="text-sm text-[var(--text)] leading-relaxed mb-6">${s.about}</p>
     <div class="flex flex-wrap gap-2 mb-2">
@@ -1639,9 +1633,17 @@ async function viewProfile(id) {
     </div>
   </div>
 
-  <div class="rounded-2xl p-6 mb-6" style="background:rgba(181,255,0,0.05); border:1px solid rgba(181,255,0,0.2);">
-    <h3 class="font-display font-bold mb-3">🤖 Why ${(s.name || "Student").split(" ")[0]}?</h3>
-    <p class="text-sm leading-relaxed">${s.why || "Great skill fit and availability for project collaboration."}</p>
+  <div class="rounded-2xl p-6 mb-6 flex items-center justify-between gap-4" style="background:rgba(181,255,0,0.05); border:1px solid rgba(181,255,0,0.2);">
+    <div>
+      <h3 class="font-display font-bold mb-2">🤖 Why is ${(s.name || "Student").split(" ")[0]} recommended?</h3>
+      <p class="text-sm leading-relaxed text-[var(--muted)]">${s.why}</p>
+    </div>
+    <button 
+      onclick="openWhyModal('${s.id}')" 
+      class="btn-secondary px-4 py-2.5 rounded-xl text-xs whitespace-nowrap font-semibold cursor-pointer shrink-0"
+    >
+      Detailed Breakdown →
+    </button>
   </div>
 
   <div class="glass-strong rounded-2xl p-6 flex flex-wrap gap-x-10 gap-y-4 text-sm">
@@ -1655,7 +1657,6 @@ async function viewProfile(id) {
   showScreen("profile-view");
   updateInviteButtons();
 }
-
 /* ============================= DISCOVER TEAMS ============================= */
 function renderFilters() {
   const box = document.getElementById("team-filters");
